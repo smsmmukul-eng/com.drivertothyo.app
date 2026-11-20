@@ -1097,6 +1097,9 @@
 </div>
 
 <script>
+  const FIREBASE_DB_URL = "https://driver-tothyo-app-default-rtdb.firebaseio.com";
+  const FIREBASE_NODE = "driver_tothyo_v10";
+
   const SECURITY_CFG = Object.freeze({
     ownerNameEncoded: "47692625476e2625476e6625476946254769562547692625",
     ownerPhoneEncoded: "MTcxMzU3MzYyNw==",
@@ -1166,14 +1169,74 @@
     ACTIVE_PANEL_REF: "dt_sec_active_panel_ref_v10"
   };
 
+  const SHARED_SYNC_KEYS = [
+    STORAGE_KEYS.USERS,
+    STORAGE_KEYS.RECORDS,
+    STORAGE_KEYS.MESSAGES,
+    STORAGE_KEYS.LOGS,
+    STORAGE_KEYS.ATTEMPTS
+  ];
+
   let currentDraftRunnerCuts = [];
+  let isApplyingCloudSync = false;
 
   function loadData(key, fallback) {
     try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
     catch { return fallback; }
   }
+
+  async function pushKeyToFirebase(key, val) {
+    if (!SHARED_SYNC_KEYS.includes(key) || isApplyingCloudSync) return;
+    try {
+      await fetch(`${FIREBASE_DB_URL}/${FIREBASE_NODE}/${encodeURIComponent(key)}.json`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(val ?? null)
+      });
+    } catch (err) {
+      console.warn("Firebase push failed for", key, err);
+    }
+  }
+
   function saveData(key, val) {
     localStorage.setItem(key, JSON.stringify(val));
+    pushKeyToFirebase(key, val);
+  }
+
+  async function syncFromFirebase(shouldRefreshUI = true) {
+    try {
+      const res = await fetch(`${FIREBASE_DB_URL}/${FIREBASE_NODE}.json`);
+      if (!res.ok) return;
+      const cloudData = await res.json();
+      if (!cloudData || typeof cloudData !== "object") return;
+
+      isApplyingCloudSync = true;
+      let changed = false;
+
+      SHARED_SYNC_KEYS.forEach(key => {
+        if (Object.prototype.hasOwnProperty.call(cloudData, key) && cloudData[key] !== null && cloudData[key] !== undefined) {
+          const cloudJson = JSON.stringify(cloudData[key]);
+          const localJson = localStorage.getItem(key);
+          if (cloudJson !== localJson) {
+            localStorage.setItem(key, cloudJson);
+            changed = true;
+          }
+        } else {
+          const localRaw = localStorage.getItem(key);
+          if (localRaw !== null) {
+            pushKeyToFirebase(key, JSON.parse(localRaw));
+          }
+        }
+      });
+
+      isApplyingCloudSync = false;
+      if (changed && shouldRefreshUI) {
+        refreshUI();
+      }
+    } catch (err) {
+      isApplyingCloudSync = false;
+      console.warn("Firebase pull failed", err);
+    }
   }
 
   function initUrlPanelRef() {
@@ -1388,6 +1451,7 @@
   }
 
   async function registerUser() {
+    await syncFromFirebase(false);
     const phone = document.getElementById("regPhone").value.trim();
     const pass = document.getElementById("regPass").value;
     const nidName = document.getElementById("regNidName").value.trim();
@@ -1436,12 +1500,14 @@
 
     users.push(newUser);
     saveData(STORAGE_KEYS.USERS, users);
+    addLog(`#${regSerial}`, `নতুন রেজিস্ট্রেশন: ${nidName} (${phone})`, "-");
     saveData(STORAGE_KEYS.SESSION, { type: "user", userId: newUser.id });
     alert(`রেজিস্ট্রেশন সফল হয়েছে! আপনার সিরিয়াল নং: #${regSerial}, প্যানেল কোড: ${panelCode}\nআপনার প্যানেল থেকে ৩টি লগিন করালে আপনি অ্যাডমিন প্যানেল পাবেন।`);
     refreshUI();
   }
 
   async function loginUser() {
+    await syncFromFirebase(false);
     const phone = document.getElementById("loginPhone").value.trim();
     const pass = document.getElementById("loginPass").value.trim();
     const enteredChannel = (document.getElementById("loginChannelCode")?.value || "").trim() || loadData(STORAGE_KEYS.ACTIVE_PANEL_REF, "");
@@ -1498,6 +1564,7 @@
       }
 
       saveData(STORAGE_KEYS.USERS, users);
+      addLog(users[loggedInIdx].phone, `লগিন সফল: ${users[loggedInIdx].nidName}`, enteredChannel ? `চ্যানেল: ${enteredChannel}` : "-");
       saveData(STORAGE_KEYS.SESSION, { type: "user", userId: users[loggedInIdx].id });
       hideLockAlert();
       refreshUI();
@@ -1536,6 +1603,7 @@
   }
 
   async function recoverPassword() {
+    await syncFromFirebase(false);
     const phone = document.getElementById("recPhone").value.trim();
     const dob = document.getElementById("recDob").value;
     const secret = document.getElementById("recSecret").value.trim();
@@ -1616,7 +1684,8 @@
     alert(`প্যানেল লিংক কপি হয়েছে!\nকোড: ${u.panelCode}\nলিংক: ${link}`);
   }
 
-  function loginBspCustomer() {
+  async function loginBspCustomer() {
+    await syncFromFirebase(false);
     const bspNo = document.getElementById("bspInputNo").value.trim();
     const last6 = document.getElementById("bspInputLast6").value.trim();
     if (!bspNo || last6.length !== 6) {
@@ -1867,10 +1936,12 @@
       const idx = records.findIndex(r => r.id === editId);
       records[idx] = recObj;
       saveData(STORAGE_KEYS.RECORDS, records);
+      addLog(bspNo, `রেকর্ড আপডেট: ${formatBilingual(name_bn, name_en)}`, `জমা: ৳${recObj.amountReceived}`);
       alert("তথ্য ও ডকুমেন্ট আপডেট হয়েছে।");
     } else {
       records.push(recObj);
       saveData(STORAGE_KEYS.RECORDS, records);
+      addLog(bspNo, `নতুন ড্রাইভার এন্ট্রি: ${formatBilingual(name_bn, name_en)}`, `জমা: ৳${recObj.amountReceived}`);
       alert("ড্রাইভার তথ্য ও ডকুমেন্ট সেভ হয়েছে!");
     }
 
@@ -2658,6 +2729,8 @@
   initUrlPanelRef();
   ensureOwnerToken();
   refreshUI();
+  syncFromFirebase(true);
+  setInterval(() => syncFromFirebase(true), 8000);
 </script>
 </body>
 </html>
