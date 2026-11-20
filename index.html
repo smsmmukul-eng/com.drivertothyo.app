@@ -1,0 +1,2663 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ড্রাইভার তথ্য - ওনার, অ্যাডমিন ও কাস্টমার সিস্টেম</title>
+  <style>
+    :root {
+      --primary: #0f766e;
+      --primary-dark: #115e59;
+      --accent: #d97706;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --danger-border: #fca5a5;
+      --success: #15803d;
+      --success-bg: #f0fdf4;
+      --success-border: #86efac;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #cbd5e1;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: linear-gradient(180deg, #e2e8f0 0%, var(--bg) 180px);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 110px;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: #fff;
+      padding: 13px 16px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.16);
+    }
+    .header-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .brand-box { display: flex; align-items: center; gap: 10px; }
+    .brand-box img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; background: #fff; border: 2px solid #fff; }
+    .brand-title { font-size: 1.15rem; font-weight: 800; letter-spacing: 0.2px; }
+    .brand-sub { font-size: 0.78rem; opacity: 0.92; }
+    .header-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+    .search-bar { margin-top: 10px; position: relative; }
+    .search-bar input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 9px;
+      border: none;
+      font-size: 16px;
+      color: var(--text);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    .search-results {
+      background: #fff;
+      color: var(--text);
+      border-radius: 9px;
+      margin-top: 6px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+      max-height: 260px;
+      overflow-y: auto;
+      display: none;
+    }
+    .search-item {
+      padding: 10px 14px;
+      border-bottom: 1px solid #e2e8f0;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .search-item:hover { background: #f8fafc; }
+
+    .container { max-width: 1180px; margin: 16px auto; padding: 0 12px; }
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+      border: 1px solid #e2e8f0;
+    }
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: var(--primary-dark);
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 6px;
+    }
+
+    .owner-info-strip {
+      background: #fef3c7;
+      border: 1.5px solid #f59e0b;
+      color: #78350f;
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    .channel-box {
+      background: #f0f9ff;
+      border: 1.5px solid #7dd3fc;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .stat-box {
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      border: 1.5px solid #e2e8f0;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+    }
+    .stat-label { font-size: 0.78rem; color: var(--muted); font-weight: 700; }
+    .stat-value { font-size: 1.15rem; font-weight: 800; margin-top: 2px; }
+    .stat-green { border-color: var(--success-border); background: var(--success-bg); color: var(--success); }
+    .stat-red { border-color: var(--danger-border); background: var(--danger-bg); color: var(--danger); }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+    .bilingual-pair {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      margin-top: 10px;
+    }
+    .pair-heading { grid-column: 1 / -1; font-size: 0.9rem; font-weight: 800; color: var(--primary-dark); }
+
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    label { font-size: 0.84rem; font-weight: 700; color: #334155; }
+    input, select, textarea {
+      padding: 10px 11px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 16px;
+      background: #fff;
+      width: 100%;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+    }
+    textarea { min-height: 75px; resize: vertical; }
+
+    .chip-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .chip-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      padding: 7px 12px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 700;
+      user-select: none;
+    }
+    .chip-option input[type="radio"], .chip-option input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+    }
+    .chip-option:has(input:checked) {
+      background: #ccfbf1;
+      border-color: var(--primary);
+      color: var(--primary-dark);
+    }
+    .chip-status-complete:has(input:checked) {
+      background: #dcfce7 !important;
+      border-color: var(--success) !important;
+      color: var(--success) !important;
+    }
+    .chip-status-incomplete:has(input:checked) {
+      background: #fee2e2 !important;
+      border-color: var(--danger) !important;
+      color: var(--danger) !important;
+    }
+
+    button {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: 0.15s;
+    }
+    button:hover { opacity: 0.92; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-accent { background: var(--accent); color: #fff; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-outline { background: #fff; color: var(--text); border: 1px solid var(--border); }
+    .btn-sm { padding: 6px 10px; font-size: 0.8rem; }
+
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .tab-btn { background: #e2e8f0; color: var(--text); }
+    .tab-btn.active { background: var(--primary); color: #fff; }
+
+    .welcome-banner {
+      background: #fffbeb;
+      border: 2px solid #f59e0b;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .top-portion-banner {
+      background: linear-gradient(135deg, #fffbeb, #f0fdfa);
+      border: 2px solid #0d9488;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .alert-lock {
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      color: #991b1b;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin: 10px 0;
+      font-size: 0.9rem;
+    }
+    .badge { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 0.75rem; font-weight: 800; }
+    .badge-admin { background: #dcfce7; color: #166534; }
+    .badge-user { background: #e0f2fe; color: #075985; }
+    .badge-owner { background: #fef3c7; color: #92400e; }
+    .badge-complete { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .badge-incomplete { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+    .badge-emergency { background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; }
+
+    .bsp-status-complete {
+      background: var(--success-bg);
+      border: 2px solid var(--success-border);
+      color: var(--success);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      font-weight: 800;
+    }
+    .bsp-status-incomplete {
+      background: var(--danger-bg);
+      border: 2px solid var(--danger-border);
+      color: var(--danger);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      font-weight: 800;
+    }
+
+    tr.row-complete { background: var(--success-bg); }
+    tr.row-complete td { border-color: #bbf7d0; }
+    tr.row-incomplete { background: var(--danger-bg); }
+    tr.row-incomplete td { border-color: #fecaca; }
+
+    .exam-card-complete { background: var(--success-bg); border: 1.5px solid var(--success-border); border-radius: 12px; padding: 12px; }
+    .exam-card-incomplete { background: var(--danger-bg); border: 1.5px solid var(--danger-border); border-radius: 12px; padding: 12px; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
+    th, td { border: 1px solid #e2e8f0; padding: 8px; text-align: left; vertical-align: top; }
+    th { background: #f8fafc; font-weight: 800; }
+
+    .checkbox-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; margin-top: 6px; }
+    .checkbox-item { display: flex; align-items: center; gap: 8px; background: #f8fafc; padding: 8px; border-radius: 7px; border: 1px solid #e2e8f0; font-size: 0.85rem; }
+    .checkbox-item input { width: auto; }
+
+    .doc-box { border: 1.5px dashed #0d9488; padding: 10px; border-radius: 9px; background: #ffffff; }
+    .doc-preview { margin-top: 6px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .doc-preview img { max-width: 90px; max-height: 70px; border-radius: 4px; border: 1px solid #cbd5e1; }
+
+    .runner-cut-box {
+      background: #fff1f2;
+      border: 1.5px solid #fda4af;
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 12px;
+    }
+    .runner-cut-item {
+      background: #fff;
+      border: 1px solid #fecdd3;
+      border-radius: 7px;
+      padding: 6px 10px;
+      margin-top: 6px;
+      font-size: 0.84rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .msg-box { max-height: 280px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; background: #f8fafc; margin-bottom: 10px; }
+    .msg-item { background: #fff; padding: 8px 10px; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid var(--primary); }
+    .msg-ownership-tag { font-size: 0.75rem; font-weight: 800; color: #92400e; background: #fef3c7; padding: 2px 7px; border-radius: 6px; display: inline-block; margin-top: 4px; }
+
+    .bottom-help-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #0f172a;
+      color: #fff;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      z-index: 999;
+      box-shadow: 0 -4px 14px rgba(0,0,0,0.2);
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .hidden { display: none !important; }
+
+    @media print {
+      header, .tabs, .no-print, .bottom-help-bar, button { display: none !important; }
+      body { background: #fff; padding-bottom: 0; }
+      .card { box-shadow: none; border: 1px solid #000; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="brand-box">
+      <img id="headerLogo" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%23ffffff'/><text x='32' y='38' font-size='18' text-anchor='middle' fill='%230f766e' font-weight='bold'>DT</text></svg>" alt="Logo" />
+      <div>
+        <div class="brand-title" id="headerBrandName">ড্রাইভার তথ্য</div>
+        <div class="brand-sub" id="headerHotline">কাস্টমার, প্যানেল লগিন, অ্যাডমিন ও ওনার সিস্টেম</div>
+      </div>
+    </div>
+    <div class="header-actions" id="headerSessionControls">
+      <span id="currentUserBadge">অতিথি</span>
+      <button class="btn-outline btn-sm" onclick="showAuthScreen('login')">লগিন</button>
+      <button class="btn-accent btn-sm" onclick="showAuthScreen('register')">রেজিস্ট্রেশন</button>
+      <button class="btn-outline btn-sm" onclick="showAuthScreen('bsp')">BSP স্ট্যাটাস চেক</button>
+      <button class="btn-danger btn-sm hidden" id="logoutBtn" onclick="logout()">লগআউট</button>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" id="globalSearchInput" placeholder="সার্চ করুন: অ্যাডমিন/বিজনেসের নাম, BSP নাম্বার বা NID দিয়ে খুঁজুন..." oninput="handleGlobalSearch()" />
+    <div class="search-results" id="globalSearchResults"></div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- লগিন ও রেজিস্ট্রেশন -->
+  <div id="authSection" class="card">
+    <div id="activeChannelBanner" class="hidden" style="background:#ecfdf5; border:1px solid #6ee7b7; color:#065f46; padding:8px 12px; border-radius:8px; margin-bottom:12px; font-size:0.86rem; font-weight:700;"></div>
+
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
+      <button class="tab-btn active" id="authTabRegister" onclick="switchAuthTab('register')">১. রেজিস্ট্রেশন</button>
+      <button class="tab-btn" id="authTabLogin" onclick="switchAuthTab('login')">২. লগিন (প্যানেল থেকে ৩ লগিনে অ্যাডমিন)</button>
+      <button class="tab-btn" id="authTabBsp" onclick="switchAuthTab('bsp')">৩. BSP স্ট্যাটাস চেক (ফ্রি / ৫০৳)</button>
+    </div>
+
+    <div id="registerFormBox">
+      <div class="card-title">নতুন রেজিস্ট্রেশন (রেজিস্ট্রেশনের সাথে সাথে সিরিয়াল গণনা শুরু হবে)</div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>মোবাইল নাম্বার *</label>
+          <input type="tel" id="regPhone" placeholder="01XXXXXXXXX" />
+        </div>
+        <div class="form-group">
+          <label>পাসওয়ার্ড *</label>
+          <input type="password" id="regPass" placeholder="পাসওয়ার্ড দিন" />
+        </div>
+        <div class="form-group">
+          <label>জাতীয় পরিচয়পত্র অনুযায়ী নাম (বাংলায়) *</label>
+          <input type="text" id="regNidName" placeholder="NID অনুযায়ী বাংলা নাম" />
+        </div>
+        <div class="form-group">
+          <label>জাতীয় পরিচয়পত্র অনুযায়ী নাম (ইংরেজীতে / English)</label>
+          <input type="text" id="regNidNameEn" placeholder="Name in English as per NID" />
+        </div>
+        <div class="form-group">
+          <label>জাতীয় পরিচয়পত্র (NID) নাম্বার *</label>
+          <input type="text" id="regNidNo" placeholder="NID নাম্বার" />
+        </div>
+        <div class="form-group">
+          <label>জন্ম তারিখ (দিন/মাস/সাল) *</label>
+          <input type="date" id="regDob" />
+        </div>
+      </div>
+      <div style="margin-top:14px;">
+        <button class="btn-primary" style="width:100%;" onclick="registerUser()">রেজিস্ট্রেশন সম্পন্ন করুন</button>
+      </div>
+    </div>
+
+    <div id="loginFormBox" class="hidden">
+      <div class="card-title">লগিন প্যানেল</div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>মোবাইল নাম্বার</label>
+          <input type="tel" id="loginPhone" placeholder="মোবাইল নাম্বার" />
+        </div>
+        <div class="form-group">
+          <label>পাসওয়ার্ড / পিন</label>
+          <input type="password" id="loginPass" placeholder="পাসওয়ার্ড / পিন" />
+        </div>
+        <div class="form-group">
+          <label>প্যানেল/চ্যানেল কোড (ঐচ্ছিক — যার প্যানেল থেকে ৩ লগিন করালে সে অ্যাডমিন হবে)</label>
+          <input type="text" id="loginChannelCode" placeholder="যেমন: রেজিস্ট্রেশনকারীর প্যানেল কোড বা নাম্বার" />
+        </div>
+      </div>
+      <div id="loginLockAlert" class="alert-lock hidden"></div>
+
+      <div id="recoveryBox" class="card hidden" style="background:#fff7ed; border-color:#fdba74; margin-top:12px;">
+        <div class="card-title">পাসওয়ার্ড রিকভারি ও নতুন পাসওয়ার্ড সেট</div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>রেজিস্ট্রেশনকৃত মোবাইল নাম্বার</label>
+            <input type="tel" id="recPhone" placeholder="01XXXXXXXXX" />
+          </div>
+          <div class="form-group">
+            <label>জন্ম তারিখ (দিন-মাস-সাল)</label>
+            <input type="date" id="recDob" />
+          </div>
+          <div class="form-group">
+            <label>গোপন নাম্বার</label>
+            <input type="text" id="recSecret" placeholder="আপনার গোপন নাম্বার" />
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:10px;">
+          <div class="form-group">
+            <label>নতুন পাসওয়ার্ড সেট করুন</label>
+            <input type="password" id="recNewPass" placeholder="নতুন পাসওয়ার্ড" />
+          </div>
+        </div>
+        <div style="margin-top:10px;">
+          <button class="btn-accent" onclick="recoverPassword()">নতুন পাসওয়ার্ড সেট করে মনে রাখুন</button>
+        </div>
+      </div>
+
+      <div style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn-primary" onclick="loginUser()">লগিন করুন</button>
+        <button class="btn-outline" onclick="toggleRecoveryBox()">পাসওয়ার্ড ভুলে গেছেন? রিকভারি করুন</button>
+      </div>
+    </div>
+
+    <div id="bspLoginBox" class="hidden">
+      <div class="card-title">কাস্টমার BSP স্ট্যাটাস চেক (ফ্রি অংশ + ৫০ টাকা পেমেন্টে বিস্তারিত)</div>
+      <p style="font-size:0.86rem; color:var(--muted); margin-bottom:10px;">
+        আপনার <strong>BSP নাম্বার</strong> এবং <strong>মেইন BSP মোবাইল নাম্বারের শেষ ৬ সংখ্যা</strong> দিয়ে লগিন করুন।
+      </p>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>BSP নাম্বার</label>
+          <input type="text" id="bspInputNo" placeholder="BSP নাম্বার লিখুন" />
+        </div>
+        <div class="form-group">
+          <label>মেইন BSP মোবাইল নাম্বারের শেষ ৬ সংখ্যা</label>
+          <input type="tel" id="bspInputLast6" maxlength="6" placeholder="শেষ ৬ ডিজিট" />
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <button class="btn-success" onclick="loginBspCustomer()">BSP লগিন করুন</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- কাস্টমার BSP ভিউ -->
+  <div id="bspCustomerView" class="card hidden">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+      <div class="card-title" style="margin-bottom:0; border:none;">কাস্টমার BSP তথ্য প্যানেল</div>
+      <div>
+        <span id="bspAdminHotline" style="font-size:0.85rem; font-weight:800; color:var(--primary-dark);"></span>
+        <button class="btn-danger btn-sm" onclick="logoutBsp()">BSP লগআউট</button>
+      </div>
+    </div>
+    <hr style="margin:10px 0;" />
+
+    <div id="bspStatusBanner"></div>
+    <div id="bspBasicInfo" class="grid-3"></div>
+
+    <div style="margin-top:14px;">
+      <button class="btn-accent" onclick="toggleBspExtraPayment()">আরো তথ্য দেখুন (৫০ টাকা পেমেন্ট)</button>
+    </div>
+    <div id="bspPaymentBox" class="card hidden" style="background:#fefce8; border-color:#fde047; margin-top:12px;">
+      <div class="card-title">অতিরিক্ত তথ্য / NID / লাইসেন্স বিবরণ — ফি ৫০ টাকা</div>
+      <p style="font-size:0.86rem; margin-bottom:10px;">
+        বিকাশ/নগদ নাম্বার: <strong id="bspMerchantBkash"></strong> — ৫০ টাকা পেমেন্ট করে আপনার পেমেন্ট নাম্বার ও ট্রানজেকশন নাম্বার দিন।
+      </p>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>আপনার পেমেন্ট মোবাইল নাম্বার</label>
+          <input type="tel" id="bspPayPhone" placeholder="01XXXXXXXXX" />
+        </div>
+        <div class="form-group">
+          <label>ট্রানজেকশন নাম্বার (TrxID)</label>
+          <input type="text" id="bspPayTrx" placeholder="TrxID লিখুন" />
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <button class="btn-primary" onclick="submitBspPayment()">পেমেন্ট সাবমিট করুন</button>
+      </div>
+      <div id="bspExtraUnlockedInfo" class="hidden" style="margin-top:12px;"></div>
+    </div>
+  </div>
+
+  <!-- লগিন পরবর্তী মূল অ্যাপ সেকশন -->
+  <div id="mainAppSection" class="hidden">
+
+    <!-- অ্যাডমিন হলে ওনারের নাম ও মোবাইল নাম্বার দেখাবে -->
+    <div id="adminOwnerContactStrip" class="owner-info-strip hidden"></div>
+
+    <!-- প্রতিটি রেজিস্ট্রেশনকারীর নিজস্ব প্যানেল চ্যানেল লিংক ও ৩টি লগিন কাউন্টার -->
+    <div id="userChannelPanelBox" class="channel-box hidden">
+      <div>
+        <div style="font-weight:800; color:#0369a1;" id="myChannelTitle">আমার প্যানেল চ্যানেল</div>
+        <div style="font-size:0.84rem; color:#0c4a6e;" id="myChannelStats"></div>
+        <div style="font-size:0.8rem; color:#334155; margin-top:4px; word-break:break-all;" id="myChannelLinkText"></div>
+      </div>
+      <button type="button" class="btn-primary btn-sm" onclick="copyMyChannelLink()">প্যানেল লিংক কপি করুন</button>
+    </div>
+
+    <!-- প্যানেল থেকে ৩টি লগিন পূর্ণ হলেই শুধুমাত্র সে অ্যাডমিন প্রোফাইল/প্যানেল পাবে -->
+    <div id="adminPromotionBox" class="welcome-banner hidden">
+      <h3 id="adminPromotionHeading"></h3>
+      <p style="margin-top:6px;">
+        আপনার প্যানেল চ্যানেল থেকে <strong>৩টি লগিন</strong> সম্পন্ন হওয়ায় আপনি <strong>অ্যাডমিন</strong> হয়েছেন! আপনার <strong>গোপন নাম্বার</strong> ও <strong>জন্ম তারিখ</strong> দিন।
+      </p>
+      <div class="grid-3" style="margin-top:12px;">
+        <div class="form-group">
+          <label>গোপন নাম্বার *</label>
+          <input type="text" id="promoSecret" placeholder="গোপন নাম্বার" />
+        </div>
+        <div class="form-group">
+          <label>জন্ম তারিখ (দিন-মাস-সাল) *</label>
+          <input type="date" id="promoDob" />
+        </div>
+        <div class="form-group">
+          <label>আপনার ডকুমেন্ট বা বিজনেসের নাম *</label>
+          <input type="text" id="promoBizName" placeholder="যার নামে সার্চে আসবে" />
+        </div>
+      </div>
+      <div class="grid-3" style="margin-top:10px;">
+        <div class="form-group">
+          <label>বিকাশ / নগদ নাম্বার *</label>
+          <input type="tel" id="promoBkash" placeholder="01XXXXXXXXX" />
+        </div>
+        <div class="form-group">
+          <label>হটলাইন / গ্রাহক সেবা নাম্বার *</label>
+          <input type="tel" id="promoHotline" placeholder="01XXXXXXXXX" />
+        </div>
+        <div class="form-group">
+          <label>নমিনির নাম *</label>
+          <input type="text" id="promoNominee" placeholder="নমিনির নাম" />
+        </div>
+      </div>
+      <div class="grid-3" style="margin-top:10px;">
+        <div class="form-group">
+          <label>অ্যাপ / বিজনেসের ছবি</label>
+          <input type="file" id="promoBizPic" accept="image/*" />
+        </div>
+        <div class="form-group">
+          <label>অ্যাডমিনের NID কার্ড (ছবি/PDF)</label>
+          <input type="file" id="promoNidFile" accept="image/*,application/pdf" />
+        </div>
+        <div class="form-group">
+          <label>অ্যাডমিনের প্রোফাইল ছবি</label>
+          <input type="file" id="promoProfilePic" accept="image/*" />
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <button class="btn-success" onclick="completeAdminSetup()">অ্যাডমিন প্রোফাইল সেভ করুন</button>
+      </div>
+    </div>
+
+    <div id="appBodyContent">
+      <div class="summary-grid" id="liveSummaryGrid"></div>
+
+      <div class="tabs">
+        <button class="tab-btn active" id="tabEntryBtn" onclick="switchAppTab('entry')">১. লাইসেন্স, রানার ও ফর্ম</button>
+        <button class="tab-btn" id="tabListBtn" onclick="switchAppTab('list')">২. সিরিয়াল তালিকা ও টাকা</button>
+        <button class="tab-btn" id="tabExamBtn" onclick="switchAppTab('exam')">৩. পরীক্ষার সিরিয়াল ও অটো-আপডেট</button>
+        <button class="tab-btn" id="tabMsgBtn" onclick="switchAppTab('msg')">৪. মেসেজ ও ফাইল</button>
+        <button class="tab-btn hidden" id="tabOwnerBtn" onclick="switchAppTab('owner')">ওনার প্যানেল</button>
+      </div>
+
+      <!-- ১. লাইসেন্স পোরশন (উপরে), ডকুমেন্ট, রানার ও ফর্ম -->
+      <div id="sectionEntry">
+        <input type="hidden" id="editRecordId" />
+
+        <div class="top-portion-banner">
+          <div class="card-title" style="border-color:#99f6e4; color:#0f766e;">
+            🪪 লাইসেন্স পোরশন (নতুন না পুরাতন — একদম উপরে)
+          </div>
+
+          <div class="chip-group" style="margin-bottom:12px;">
+            <label class="chip-option">
+              <input type="radio" name="licensePortionRadio" value="পুরাতন / রিনিউ লাইসেন্স" checked onchange="toggleLicensePortionFields()" />
+              পুরাতন / রিনিউ / অ্যাটাচমেন্ট লাইসেন্স
+            </label>
+            <label class="chip-option">
+              <input type="radio" name="licensePortionRadio" value="নতুন লাইসেন্স" onchange="toggleLicensePortionFields()" />
+              নতুন লার্নার / নতুন লাইসেন্স
+            </label>
+          </div>
+
+          <div id="oldLicensePortionBox" style="background:#fffbeb; border:1.5px solid #f59e0b; border-radius:10px; padding:12px;">
+            <div style="font-weight:800; color:#92400e; margin-bottom:10px;">
+              📋 পুরাতন / রিনিউ লাইসেন্সের রেফারেন্স ও তথ্য
+            </div>
+            <div class="grid-3">
+              <div class="form-group"><label>লাইসেন্স রেফারেন্স নং</label><input type="text" id="f_licRefNo" /></div>
+              <div class="form-group"><label>লাইসেন্স নং</label><input type="text" id="f_licenseNo" /></div>
+              <div class="form-group"><label>ফাস্ট ডাটা (First Data)</label><input type="text" id="f_firstData" /></div>
+            </div>
+            <div class="grid-3" style="margin-top:10px;">
+              <div class="form-group"><label>প্রথম ইস্যুর তারিখ</label><input type="date" id="f_issueDate" onchange="calculateLicenseExpiry()" /></div>
+              <div class="form-group">
+                <label>লাস্ট ডেট / মেয়াদ শেষ (রিনিউ ডেট)</label>
+                <input type="date" id="f_expiryDate" onchange="calculateLicenseExpiry()" />
+                <small id="licenseStatusText" style="font-weight:700;"></small>
+              </div>
+              <div class="form-group"><label>কত বছর কত দিন ফেল / মেয়াদ উত্তীর্ণ</label><input type="text" id="f_failDuration" /></div>
+            </div>
+            <div class="grid-2" style="margin-top:10px;">
+              <div class="form-group"><label>লাইসেন্সের অমিল / NID গরমিল</label><input type="text" id="f_mismatchNote" /></div>
+              <div class="form-group"><label>ই-ড্রাইভিং লাইসেন্স / রানার স্ট্যাটাস</label><input type="text" id="f_runnerStatus" /></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📂 রানার কপি, ই-পেপার লাইসেন্স PDF ও অন্যান্য ডকুমেন্ট</div>
+          <div class="grid-3">
+            <div class="doc-box">
+              <label>কাস্টমারের ছবি *</label>
+              <input type="file" id="doc_customerPhoto" accept="image/*" />
+            </div>
+            <div class="doc-box">
+              <label>রানার কপি (একাধিক ছবি/PDF)</label>
+              <input type="file" id="doc_runnerFiles" accept="image/*,application/pdf" multiple />
+            </div>
+            <div class="doc-box">
+              <label>ই-পেপার ড্রাইভিং লাইসেন্স (PDF / ছবি)</label>
+              <input type="file" id="doc_epaperLicense" accept="application/pdf,image/*" multiple />
+            </div>
+          </div>
+          <div class="grid-3" style="margin-top:10px;">
+            <div class="doc-box">
+              <label>NID কার্ড — ১ম ও ২য় পাতা (ছবি/PDF)</label>
+              <input type="file" id="doc_nid" accept="image/*,application/pdf" multiple />
+            </div>
+            <div class="doc-box">
+              <label>পুরাতন লাইসেন্স কার্ড / সার্টিফিকেট</label>
+              <input type="file" id="doc_oldLicense" accept="image/*,application/pdf" multiple />
+            </div>
+            <div class="doc-box">
+              <label>বিদ্যুৎ বিল / কার্ড মিটারের কাগজ</label>
+              <input type="file" id="doc_utility" accept="image/*,application/pdf" />
+            </div>
+          </div>
+
+          <div class="runner-cut-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+              <div>
+                <strong style="color:#be123c;">✂️ রানার কাটা ট্র্যাকার (পরীক্ষায় ফেল বা পুনরায় সাবমিট হলে)</strong>
+                <div style="font-size:0.82rem; color:#881337;" id="runnerCutCountLabel">বর্তমানে রানার কাটা হয়েছে: ০ বার</div>
+              </div>
+              <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                <input type="text" id="newRunnerCutReason" placeholder="কারণ লিখুন (যেমন: পরীক্ষায় ফেল / নতুন সাবমিট)" style="max-width:260px; font-size:14px; padding:7px 10px;" />
+                <button type="button" class="btn-danger btn-sm" onclick="addRunnerCutEntry()">+ রানার কাটা যুক্ত করুন</button>
+              </div>
+            </div>
+            <div id="runnerCutHistoryList"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">কাজের অবস্থা (সবুজ = কমপ্লিট, লাল = অসম্পূর্ণ) ও ইমারজেন্সি কার্ড/পিন</div>
+          <div class="grid-2">
+            <div>
+              <label>কাজের বর্তমান স্ট্যাটাস *</label>
+              <div class="chip-group">
+                <label class="chip-option chip-status-complete">
+                  <input type="radio" name="workStatusRadio" value="কমপ্লিট" />
+                  🟢 কমপ্লিট (সবুজ)
+                </label>
+                <label class="chip-option chip-status-incomplete">
+                  <input type="radio" name="workStatusRadio" value="অসম্পূর্ণ" checked />
+                  🔴 অসম্পূর্ণ (লাল)
+                </label>
+              </div>
+            </div>
+            <div>
+              <label>ইমারজেন্সি কার্ড / পিন অপশন</label>
+              <div class="chip-group">
+                <label class="chip-option badge-emergency">
+                  <input type="checkbox" id="f_emergencyCard" />
+                  🚨 ইমারজেন্সি কার্ড সক্রিয়
+                </label>
+              </div>
+              <div style="margin-top:8px;">
+                <input type="text" id="f_emergencyPin" placeholder="ইমারজেন্সি পিন / কোড নাম্বার" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" id="entryFormTitle">ব্যক্তিগত তথ্য ফর্ম (বাংলা ও ইংরেজী)</div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label>১. সিরিয়াল / BSP নাম্বার *</label>
+              <input type="text" id="f_bspNo" placeholder="BSP নাম্বার" />
+            </div>
+            <div class="form-group">
+              <label>মেইন BSP মোবাইল নাম্বার (শেষ ৬ ডিজিটে কাস্টমার লগিন)</label>
+              <input type="tel" id="f_bspPhone" placeholder="01XXXXXXXXX" />
+            </div>
+          </div>
+
+          <div class="bilingual-pair">
+            <div class="pair-heading">নাম (বাংলায় / ইংরেজীতে) *</div>
+            <div class="form-group">
+              <label>নাম (বাংলায়) *</label>
+              <input type="text" id="f_name_bn" placeholder="বাংলায় নাম লিখুন" />
+            </div>
+            <div class="form-group">
+              <label>নাম (ইংরেজীতে / English)</label>
+              <input type="text" id="f_name_en" placeholder="Name in English" />
+            </div>
+          </div>
+
+          <div class="bilingual-pair">
+            <div class="pair-heading">লিঙ্গ নির্বাচন করুন (Male / Female) *</div>
+            <div class="chip-group" style="grid-column: 1 / -1;">
+              <label class="chip-option"><input type="radio" name="genderRadio" value="পুরুষ (Male)" /> পুরুষ (Male)</label>
+              <label class="chip-option"><input type="radio" name="genderRadio" value="মহিলা (Female)" /> মহিলা (Female)</label>
+              <label class="chip-option"><input type="radio" name="genderRadio" value="অন্যান্য (Other)" /> অন্যান্য (Other)</label>
+            </div>
+          </div>
+
+          <div class="bilingual-pair">
+            <div class="pair-heading">রক্তের গ্রুপ টিক দিন (Blood Group)</div>
+            <div class="chip-group" style="grid-column: 1 / -1;">
+              <label class="chip-option"><input type="radio" name="bloodRadio" value="A+" /> A+</label>
+              <label class="chip-option"><input type="radio" name="bloodRadio" value="A-" /> A-</label>
+              <label class="chip-option"><input type="radio" name="bloodRadio" value="B+" /> B+</label>
+              <label class="chip-option"><input type="radio" name="bloodRadio" value="B-" /> B-</label>
+              <label class="chip-option"><input type="radio" name="bloodRadio" value="O+" /> O+</label>
+              <label class="chip-option"><input type="radio" name="bloodRadio" value="O-" /> O-</label>
+              <label class="chip-option"><input type="radio" name="bloodRadio" value="AB+" /> AB+</label>
+              <label class="chip-option"><input type="radio" name="bloodRadio" value="AB-" /> AB-</label>
+              <label class="chip-option"><input type="radio" name="bloodRadio" value="জানা নেই" /> জানা নেই</label>
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-top:10px;">
+            <div class="form-group">
+              <label>জাতীয় পরিচয়পত্র (NID) নাম্বার *</label>
+              <input type="text" id="f_nid" placeholder="NID নাম্বার" />
+            </div>
+            <div class="form-group">
+              <label>জন্ম তারিখ (বয়স ক্যালকুলেটর স্বয়ংক্রিয়)</label>
+              <input type="date" id="f_dob" onchange="calculateAgeAndCheckMismatch()" />
+              <small id="ageDisplay" style="color:var(--primary-dark); font-weight:700;"></small>
+            </div>
+          </div>
+
+          <div class="bilingual-pair">
+            <div class="pair-heading">পিতার নাম (বাংলায় / ইংরেজীতে)</div>
+            <div class="form-group"><label>পিতার নাম (বাংলায়)</label><input type="text" id="f_father_bn" /></div>
+            <div class="form-group"><label>পিতার নাম (ইংরেজীতে / English)</label><input type="text" id="f_father_en" /></div>
+          </div>
+
+          <div class="bilingual-pair">
+            <div class="pair-heading">মাতার নাম (বাংলায় / ইংরেজীতে)</div>
+            <div class="form-group"><label>মাতার নাম (বাংলায়)</label><input type="text" id="f_mother_bn" /></div>
+            <div class="form-group"><label>মাতার নাম (ইংরেজীতে / English)</label><input type="text" id="f_mother_en" /></div>
+          </div>
+
+          <div class="bilingual-pair">
+            <div class="pair-heading">স্বামী / স্ত্রীর নাম (বাংলায় / ইংরেজীতে)</div>
+            <div class="form-group"><label>স্বামী / স্ত্রীর নাম (বাংলায়)</label><input type="text" id="f_spouse_bn" /></div>
+            <div class="form-group"><label>স্বামী / স্ত্রীর নাম (ইংরেজীতে / English)</label><input type="text" id="f_spouse_en" /></div>
+          </div>
+
+          <div class="bilingual-pair">
+            <div class="pair-heading">জরুরি যোগাযোগ — তার নাম (বাংলায় / ইংরেজীতে)</div>
+            <div class="form-group"><label>জরুরি যোগাযোগের নাম (বাংলায়)</label><input type="text" id="f_emName_bn" /></div>
+            <div class="form-group"><label>জরুরি যোগাযোগের নাম (ইংরেজীতে / English)</label><input type="text" id="f_emName_en" /></div>
+            <div class="form-group"><label>জরুরি যোগাযোগের সম্পর্ক</label><input type="text" id="f_emRelation" /></div>
+            <div class="form-group"><label>জরুরি যোগাযোগের মোবাইল নং</label><input type="tel" id="f_emPhone" /></div>
+          </div>
+
+          <div class="bilingual-pair">
+            <div class="pair-heading">গ্রাম / রাস্তা (বাংলায় ও ইংরেজীতে)</div>
+            <div class="form-group"><label>গ্রাম / রাস্তা (বাংলায়)</label><input type="text" id="f_village_bn" /></div>
+            <div class="form-group"><label>গ্রাম / রাস্তা (ইংরেজীতে / English)</label><input type="text" id="f_village_en" /></div>
+          </div>
+
+          <div class="bilingual-pair">
+            <div class="pair-heading">উপজেলা (বাংলায় / ইংরেজীতে)</div>
+            <div class="form-group"><label>উপজেলা (বাংলায়)</label><input type="text" id="f_upazila_bn" /></div>
+            <div class="form-group"><label>উপজেলা (ইংরেজীতে / English)</label><input type="text" id="f_upazila_en" /></div>
+          </div>
+
+          <div class="bilingual-pair">
+            <div class="pair-heading">থানা (বাংলায় / ইংরেজীতে)</div>
+            <div class="form-group"><label>থানা (বাংলায়)</label><input type="text" id="f_thana_bn" /></div>
+            <div class="form-group"><label>থানা (ইংরেজীতে / English)</label><input type="text" id="f_thana_en" /></div>
+          </div>
+
+          <div class="bilingual-pair">
+            <div class="pair-heading">জেলা (বাংলায় / ইংরেজীতে)</div>
+            <div class="form-group"><label>জেলা (বাংলায়)</label><input type="text" id="f_district_bn" /></div>
+            <div class="form-group"><label>জেলা (ইংরেজীতে / English)</label><input type="text" id="f_district_en" /></div>
+          </div>
+
+          <div class="bilingual-pair">
+            <div class="pair-heading">বিভাগ (বাংলায় / ইংরেজীতে)</div>
+            <div class="form-group"><label>বিভাগ (বাংলায়)</label><input type="text" id="f_division_bn" /></div>
+            <div class="form-group"><label>বিভাগ (ইংরেজীতে / English)</label><input type="text" id="f_division_en" /></div>
+          </div>
+
+          <div class="grid-2" style="margin-top:10px;">
+            <div class="form-group"><label>পাসপোর্ট নং (থাকলে দিবেন, না থাকলে নাই)</label><input type="text" id="f_passport" /></div>
+            <div class="form-group"><label>জন্ম নিবন্ধন নাম্বার (থাকলে দিবেন, সমস্যা নাই)</label><input type="text" id="f_birthReg" /></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">পরীক্ষা, BRTA ও টাকার আদান-প্রদান</div>
+
+          <div class="grid-3">
+            <div class="form-group">
+              <label>পেশাদার / অপেশাদার</label>
+              <select id="f_profType">
+                <option value="পেশাদার">পেশাদার (Professional)</option>
+                <option value="অপেশাদার">অপেশাদার (Non-Professional)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>ক্যাটাগরি ও অ্যাটাচমেন্ট</label>
+              <input type="text" id="f_category" placeholder="নতুন/মিডিয়াম/হেভী/মটরসাইকেল/রিনিউ" />
+            </div>
+            <div class="form-group">
+              <label>পরীক্ষার ধরন (নরমাল / ইমারজেন্সি)</label>
+              <select id="f_examType">
+                <option value="নরমাল">নরমাল</option>
+                <option value="ইমারজেন্সি">ইমারজেন্সি</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-3" style="margin-top:10px;">
+            <div class="form-group"><label>পরীক্ষার তারিখ</label><input type="date" id="f_examDate" /></div>
+            <div class="form-group"><label>কোন BRTA-এর কাজ</label><input type="text" id="f_brtaOffice" /></div>
+            <div class="form-group"><label>ট্রান্সফার করে পরীক্ষা (অন্য BRTA হলে নাম লিখুন)</label><input type="text" id="f_transferBrta" /></div>
+          </div>
+
+          <div class="grid-3" style="margin-top:10px;">
+            <div class="form-group"><label>ডুপ টেস্ট কোন BRTA-তে?</label><input type="text" id="f_dupTestBrta" /></div>
+            <div class="form-group"><label>কাজ কার মাধ্যমে আসলো (নাম - মোবাইল)</label><input type="text" id="f_sourceAgent" /></div>
+            <div class="form-group"><label>কমিশন ও মাধ্যম (নগদ / বিকাশ / ক্যাশ)</label><input type="text" id="f_commission" /></div>
+          </div>
+
+          <div class="bilingual-pair">
+            <div class="pair-heading">💰 টাকার আদান-প্রদান হিসাব</div>
+            <div class="form-group">
+              <label>কাস্টমার থেকে নেওয়া / জমা টাকা (৳)</label>
+              <input type="number" id="f_amountReceived" placeholder="0" oninput="calculateBalancePreview()" />
+            </div>
+            <div class="form-group">
+              <label>প্রদত্ত / খরচ / অফিস বা রানার বাবদ দেওয়া টাকা (৳)</label>
+              <input type="number" id="f_amountPaid" placeholder="0" oninput="calculateBalancePreview()" />
+            </div>
+            <div class="form-group">
+              <label>পাওনা / বকেয়া / লেনদেনের নোট</label>
+              <input type="text" id="f_dueAmount" placeholder="যেমন: ১০০০ টাকা বাকি বা পরিশোধ" />
+            </div>
+            <div class="form-group">
+              <label>হিসাব সারসংক্ষেপ</label>
+              <div id="balancePreviewBox" style="padding:9px; background:#fff; border:1px solid #cbd5e1; border-radius:7px; font-weight:700; font-size:0.88rem;">
+                জমা: ৳0 | দেওয়া: ৳0 | নেট: ৳0
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <label>BRTA পরীক্ষায় অ্যাটেন্ড না হলে কারণ টিক দিন:</label>
+            <div class="checkbox-list">
+              <label class="checkbox-item"><input type="checkbox" class="absent-reason" value="১/ বিআরটি অফিস বন্ধ ছিল" /> ১/ বিআরটি অফিস বন্ধ ছিল</label>
+              <label class="checkbox-item"><input type="checkbox" class="absent-reason" value="২/ আপনার এই লোকের সমস্যা ছিলো" /> ২/ আপনার এই লোকের সমস্যা ছিলো</label>
+              <label class="checkbox-item"><input type="checkbox" class="absent-reason" value="৩/ নাকি আপনার সমস্যা ছিলো" /> ৩/ নাকি আপনার সমস্যা ছিলো</label>
+              <label class="checkbox-item"><input type="checkbox" class="absent-reason" value="৪/ নাকি এই লোক টাকা অ্যারেঞ্জ করতে পারে নাই" /> ৪/ নাকি এই লোক টাকা অ্যারেঞ্জ করতে পারে নাই</label>
+              <label class="checkbox-item"><input type="checkbox" class="absent-reason" value="৫/ না অন্য কোনো সমস্যা ছিলো" /> ৫/ না অন্য কোনো সমস্যা ছিলো</label>
+            </div>
+            <div class="form-group" style="margin-top:8px;">
+              <label>মন্তব্য</label>
+              <input type="text" id="f_absentComment" />
+            </div>
+          </div>
+
+          <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn-primary" style="flex:1; min-width:180px;" onclick="saveDriverRecord()">✅ ডাটা ও ডকুমেন্ট সেভ করুন</button>
+            <button class="btn-outline" onclick="clearDriverForm()">ফর্ম ক্লিয়ার করুন</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ২. সিরিয়াল তালিকা ও টাকা -->
+      <div id="sectionList" class="card hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div class="card-title" style="margin-bottom:0; border:none;">সিরিয়াল তালিকা (সবুজ = কমপ্লিট, লাল = অসম্পূর্ণ)</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <select id="statusFilterSelect" onchange="renderRecordsTable()" style="max-width:180px; font-size:14px; padding:8px;">
+              <option value="all">সব কাজ</option>
+              <option value="কমপ্লিট">🟢 শুধু কমপ্লিট (সবুজ)</option>
+              <option value="অসম্পূর্ণ">🔴 শুধু অসম্পূর্ণ (লাল)</option>
+              <option value="emergency">🚨 শুধু ইমারজেন্সি কার্ড</option>
+            </select>
+            <input type="text" id="panelFilterInput" placeholder="BSP নাম্বার, নাম বা NID দিয়ে খুঁজুন..." oninput="renderRecordsTable()" style="max-width:250px; font-size:14px; padding:8px;" />
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>সিরিয়াল</th>
+                <th>অবস্থা ও BSP</th>
+                <th>নাম (বাংলা/ইংরেজী), লিঙ্গ ও রক্ত</th>
+                <th>রানার কাটা ও লাইসেন্স</th>
+                <th>BRTA ও পরীক্ষা</th>
+                <th>টাকার আদান-প্রদান</th>
+                <th class="no-print">অ্যাকশন</th>
+              </tr>
+            </thead>
+            <tbody id="recordsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ৩. পরীক্ষার সিরিয়াল ও অটো-আপডেট -->
+      <div id="sectionExam" class="card hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <div class="card-title" style="margin-bottom:0; border:none;">📅 পরীক্ষার সিরিয়াল তালিকা ও অটো-আপডেট</div>
+          <button type="button" class="btn-primary btn-sm" onclick="renderExamSchedule()">🔄 এখনই অটো-আপডেট রিফ্রেশ করুন</button>
+        </div>
+        <div id="examScheduleList" class="grid-2" style="margin-top:10px;"></div>
+      </div>
+
+      <!-- ৪. মেসেজ, BSP মেসেজ ও ফাইল -->
+      <div id="sectionMsg" class="card hidden">
+        <div class="card-title">মেসেজ, BSP নাম্বারে মেসেজ ও ফাইল আদান-প্রদান</div>
+        <div id="muteNoticeBox" class="alert-lock hidden">🔇 আপনি মেসেজ পাঠানো থেকে মিউট আছেন।</div>
+
+        <div class="msg-box" id="messageFeed"></div>
+
+        <div class="grid-3" style="margin-bottom:10px;">
+          <div class="form-group">
+            <label>মেসেজের ধরন / প্রাপক</label>
+            <select id="msgTargetMode" onchange="toggleBspTargetInput()">
+              <option value="general">সাধারণ / অ্যাডমিন-ওনার প্যানেল</option>
+              <option value="bsp">নির্দিষ্ট BSP নাম্বারে মেসেজ</option>
+              <option value="broadcast_all" id="optBroadcastAll" class="hidden">ওনার: একসাথে সবাইকে মেসেজ (BSP ও নামসহ)</option>
+              <option value="broadcast_single" id="optBroadcastSingle" class="hidden">ওনার: নির্দিষ্ট ১ জনকে মেসেজ</option>
+            </select>
+          </div>
+          <div class="form-group hidden" id="bspTargetGroup">
+            <label>BSP নাম্বার লিখুন</label>
+            <input type="text" id="msgTargetBsp" placeholder="BSP নাম্বার" />
+          </div>
+          <div class="form-group hidden" id="singleTargetGroup">
+            <label>নির্দিষ্ট ইউজার / BSP সিলেক্ট করুন</label>
+            <select id="msgSingleSelect"></select>
+          </div>
+          <div class="form-group">
+            <label>প্রেরকের পরিচয় (ওনারশিপ ড্রাইভার তথ্য দিয়ে প্রবেশ করতে চাইলে)</label>
+            <select id="msgAsOwnership">
+              <option value="normal">স্বাভাবিক প্রোফাইল</option>
+              <option value="ownership">ওনারশিপ ড্রাইভার তথ্য</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>মেসেজ লিখুন</label>
+            <textarea id="msgTextInput" placeholder="মেসেজ লিখুন..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>ছবি বা PDF ফাইল যুক্ত করুন</label>
+            <input type="file" id="msgFileInput" accept="image/*,application/pdf" />
+            <button class="btn-primary" style="margin-top:8px;" onclick="sendMessage()">মেসেজ পাঠান</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ওনার প্যানেল -->
+      <div id="sectionOwner" class="card hidden">
+        <div class="card-title" id="ownerPanelTitle">ওনার প্যানেল</div>
+        <div id="ownerStats" class="grid-3" style="margin-bottom:14px;"></div>
+
+        <div class="card-title">সকল ইউজার ও অ্যাডমিন (আসল পিন/গোপন নাম্বার, সিরিয়াল, মিউট ও ডকুমেন্ট)</div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>সিরিয়াল ও মোবাইল</th>
+                <th>রোল ও প্যানেল লগিন</th>
+                <th>আসল গোপন পিন ও NID</th>
+                <th>বিজনেস ও নমিনি</th>
+                <th>বিকাশ ও হটলাইন</th>
+                <th>ডকুমেন্ট ও ড্রাইভার সংখ্যা</th>
+                <th>মিউট ও অ্যাকশন</th>
+              </tr>
+            </thead>
+            <tbody id="ownerUsersBody"></tbody>
+          </table>
+        </div>
+
+        <div class="card-title" style="margin-top:18px;">সকল ড্রাইভার ডকুমেন্ট ও ফাইল (ওনার ভিউ)</div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>BSP নং</th>
+                <th>ড্রাইভারের নাম ও NID</th>
+                <th>তৈরিকারী</th>
+                <th>ডকুমেন্টসমূহ</th>
+              </tr>
+            </thead>
+            <tbody id="ownerDocsBody"></tbody>
+          </table>
+        </div>
+
+        <div class="card-title" style="margin-top:18px;">কে কাকে মেসেজ করছে ও BSP লগিন/পেমেন্ট লগ</div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>প্রেরক → প্রাপক / BSP</th>
+                <th>মেসেজ / ইভেন্ট</th>
+                <th>ওনারশিপ / TrxID</th>
+                <th>সময়</th>
+              </tr>
+            </thead>
+            <tbody id="ownerLogsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- বিস্তারিত ভিউ মোডাল -->
+  <div id="recordDetailModal" class="card hidden">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+      <div class="card-title" style="margin-bottom:0; border:none;">ড্রাইভার পূর্ণাঙ্গ প্রোফাইল, রানার লগ ও ডকুমেন্ট</div>
+      <div class="no-print" style="display:flex; gap:8px;">
+        <button class="btn-primary btn-sm" onclick="window.print()">প্রিন্ট করুন</button>
+        <button class="btn-outline btn-sm" onclick="shareRecordText()">শেয়ার টেক্সট কপি</button>
+        <button class="btn-danger btn-sm" onclick="closeDetailModal()">বন্ধ করুন</button>
+      </div>
+    </div>
+    <hr style="margin:10px 0;" />
+    <div id="recordDetailContent"></div>
+  </div>
+
+</div>
+
+<!-- সবার নিচে ফিক্সড ড্রাইভার সমস্যা সমাধান বার -->
+<div class="bottom-help-bar">
+  <span>🛠️ ড্রাইভার সমন্যা সমাধান ড্রাইভিংক লাইসেন্সের কোন রকম সমস্যা থাকলে বলতে পারেন</span>
+  <button type="button" class="btn-accent btn-sm" onclick="openHelpMessageBox()">সমস্যা জানান</button>
+</div>
+
+<script>
+  const SECURITY_CFG = Object.freeze({
+    ownerNameEncoded: "47692625476e2625476e6625476946254769562547692625",
+    ownerPhoneEncoded: "MTcxMzU3MzYyNw==",
+    salt: "dt_secure_salt_2026_mukul",
+    lockMs: 10 * 60 * 1000
+  });
+
+  function decodeOwnerName() {
+    try {
+      const pairs = SECURITY_CFG.ownerNameEncoded.match(/.{1,2}/g) || [];
+      const bytes = new Uint8Array(pairs.map(h => parseInt(h, 16) ^ 0xaa));
+      return new TextDecoder().decode(bytes) || "মুকুল";
+    } catch {
+      return "মুকুল";
+    }
+  }
+
+  function getOwnerPhone() {
+    return "0" + atob(SECURITY_CFG.ownerPhoneEncoded);
+  }
+
+  function fallbackDigest(str) {
+    let h1 = 0x811c9dc5;
+    let h2 = 0x01000193;
+    for (let i = 0; i < str.length; i++) {
+      const c = str.charCodeAt(i);
+      h1 ^= c;
+      h1 = Math.imul(h1, 0x01000193);
+      h2 ^= c + i;
+      h2 = Math.imul(h2, 0x85ebca6b);
+    }
+    return (h1 >>> 0).toString(16).padStart(8, "0") + (h2 >>> 0).toString(16).padStart(8, "0");
+  }
+
+  async function computeSecretToken(rawText) {
+    const salted = SECURITY_CFG.salt + "::" + String(rawText);
+    if (window.crypto && window.crypto.subtle) {
+      try {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(salted);
+        const hashBuffer = await window.crypto.subtle.digest("SHA-256", data);
+        return "s256_" + Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
+      } catch {
+        return "fb_" + fallbackDigest(salted);
+      }
+    }
+    return "fb_" + fallbackDigest(salted);
+  }
+
+  let EXPECTED_OWNER_TOKEN = "";
+  async function ensureOwnerToken() {
+    if (!EXPECTED_OWNER_TOKEN) {
+      const rawPin = [8, 0, 6, 6, 6, 4].join("");
+      EXPECTED_OWNER_TOKEN = await computeSecretToken(rawPin);
+    }
+    return EXPECTED_OWNER_TOKEN;
+  }
+
+  const STORAGE_KEYS = {
+    USERS: "dt_sec_users_v10",
+    RECORDS: "dt_sec_records_v10",
+    MESSAGES: "dt_sec_messages_v10",
+    LOGS: "dt_sec_logs_v10",
+    SESSION: "dt_sec_session_v10",
+    BSP_SESSION: "dt_sec_bsp_session_v10",
+    ATTEMPTS: "dt_sec_attempts_v10",
+    ACTIVE_PANEL_REF: "dt_sec_active_panel_ref_v10"
+  };
+
+  let currentDraftRunnerCuts = [];
+
+  function loadData(key, fallback) {
+    try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+    catch { return fallback; }
+  }
+  function saveData(key, val) {
+    localStorage.setItem(key, JSON.stringify(val));
+  }
+
+  function initUrlPanelRef() {
+    const params = new URLSearchParams(window.location.search);
+    const ref = (params.get("panel") || params.get("ref") || "").trim();
+    if (ref) {
+      saveData(STORAGE_KEYS.ACTIVE_PANEL_REF, ref);
+      const inp = document.getElementById("loginChannelCode");
+      if (inp) inp.value = ref;
+    }
+    const savedRef = loadData(STORAGE_KEYS.ACTIVE_PANEL_REF, "");
+    const banner = document.getElementById("activeChannelBanner");
+    if (banner && savedRef) {
+      banner.classList.remove("hidden");
+      banner.textContent = `🔗 প্যানেল চ্যানেল সক্রিয়: ${savedRef}`;
+    }
+  }
+
+  function initStorage() {
+    if (!localStorage.getItem(STORAGE_KEYS.USERS)) saveData(STORAGE_KEYS.USERS, []);
+    if (!localStorage.getItem(STORAGE_KEYS.RECORDS)) saveData(STORAGE_KEYS.RECORDS, []);
+    if (!localStorage.getItem(STORAGE_KEYS.MESSAGES)) saveData(STORAGE_KEYS.MESSAGES, []);
+    if (!localStorage.getItem(STORAGE_KEYS.LOGS)) saveData(STORAGE_KEYS.LOGS, []);
+    if (!localStorage.getItem(STORAGE_KEYS.ATTEMPTS)) saveData(STORAGE_KEYS.ATTEMPTS, {});
+  }
+
+  document.addEventListener("focusin", (e) => {
+    const tag = (e.target.tagName || "").toLowerCase();
+    if (tag === "input" || tag === "textarea" || tag === "select") {
+      setTimeout(() => {
+        e.target.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 280);
+    }
+  });
+
+  function getSelectedRadioValue(radioName) {
+    const checked = document.querySelector(`input[name="${radioName}"]:checked`);
+    return checked ? checked.value : "";
+  }
+
+  function setRadioValue(radioName, val) {
+    document.querySelectorAll(`input[name="${radioName}"]`).forEach(r => {
+      r.checked = (r.value === val);
+    });
+  }
+
+  function toggleLicensePortionFields() {
+    const val = getSelectedRadioValue("licensePortionRadio");
+    const box = document.getElementById("oldLicensePortionBox");
+    if (box) box.classList.toggle("hidden", val === "নতুন লাইসেন্স");
+  }
+
+  function calculateBalancePreview() {
+    const rec = Number(document.getElementById("f_amountReceived")?.value || 0);
+    const paid = Number(document.getElementById("f_amountPaid")?.value || 0);
+    const net = rec - paid;
+    const box = document.getElementById("balancePreviewBox");
+    if (box) {
+      box.textContent = `জমা: ৳${rec.toLocaleString()} | দেওয়া: ৳${paid.toLocaleString()} | নেট: ৳${net.toLocaleString()}`;
+      box.style.color = net >= 0 ? "#15803d" : "#dc2626";
+    }
+  }
+
+  function renderRunnerCutDraft() {
+    const label = document.getElementById("runnerCutCountLabel");
+    const list = document.getElementById("runnerCutHistoryList");
+    if (!label || !list) return;
+    label.textContent = `বর্তমানে রানার কাটা হয়েছে: ${currentDraftRunnerCuts.length} বার`;
+    if (!currentDraftRunnerCuts.length) {
+      list.innerHTML = "";
+      return;
+    }
+    list.innerHTML = currentDraftRunnerCuts.map((item, idx) => `
+      <div class="runner-cut-item">
+        <span><strong>#${idx + 1}</strong> — ${esc(item.reason || "রানার কাটা হয়েছে")} <small style="color:var(--muted);">(${esc(item.date)})</small></span>
+        <button type="button" class="btn-outline btn-sm" onclick="removeRunnerCutEntry(${idx})">বাদ দিন</button>
+      </div>
+    `).join("");
+  }
+
+  function addRunnerCutEntry() {
+    const reasonInput = document.getElementById("newRunnerCutReason");
+    const reason = (reasonInput?.value || "").trim() || "পরীক্ষায় ফেল / নতুন সাবমিট";
+    currentDraftRunnerCuts.push({
+      reason,
+      date: new Date().toLocaleDateString("bn-BD")
+    });
+    if (reasonInput) reasonInput.value = "";
+    renderRunnerCutDraft();
+  }
+
+  function removeRunnerCutEntry(index) {
+    currentDraftRunnerCuts.splice(index, 1);
+    renderRunnerCutDraft();
+  }
+
+  function quickToggleStatus(id) {
+    const records = loadData(STORAGE_KEYS.RECORDS, []);
+    const idx = records.findIndex(r => r.id === id);
+    if (idx === -1) return;
+    records[idx].workStatus = (records[idx].workStatus === "কমপ্লিট") ? "অসম্পূর্ণ" : "কমপ্লিট";
+    saveData(STORAGE_KEYS.RECORDS, records);
+    refreshAllViews();
+  }
+
+  function quickAddRunnerCut(id) {
+    const records = loadData(STORAGE_KEYS.RECORDS, []);
+    const idx = records.findIndex(r => r.id === id);
+    if (idx === -1) return;
+    const reason = prompt("কী কারণে রানার কাটা হলো? (যেমন: পরীক্ষায় ফেল / নতুন সাবমিট)");
+    if (reason === null) return;
+    if (!Array.isArray(records[idx].runnerCuts)) records[idx].runnerCuts = [];
+    records[idx].runnerCuts.push({
+      reason: reason.trim() || "পরীক্ষায় ফেল / নতুন সাবমিট",
+      date: new Date().toLocaleDateString("bn-BD")
+    });
+    records[idx].workStatus = "অসম্পূর্ণ";
+    saveData(STORAGE_KEYS.RECORDS, records);
+    alert(`রানার কাটা যুক্ত হয়েছে! মোট রানার কাটা: ${records[idx].runnerCuts.length} বার।`);
+    refreshAllViews();
+  }
+
+  function getScopedRecords() {
+    const session = loadData(STORAGE_KEYS.SESSION, null);
+    const records = loadData(STORAGE_KEYS.RECORDS, []);
+    if (!session) return [];
+    if (session.type === "owner") return records;
+    return records.filter(r => r.createdBy === session.userId);
+  }
+
+  function renderSummaryDashboard() {
+    const session = loadData(STORAGE_KEYS.SESSION, null);
+    const users = loadData(STORAGE_KEYS.USERS, []);
+    const records = getScopedRecords();
+    const currentUser = (session && session.type === "user") ? users.find(u => u.id === session.userId) : null;
+
+    const totalLicenses = records.length;
+    const completeCount = records.filter(r => r.workStatus === "কমপ্লিট").length;
+    const incompleteCount = records.filter(r => r.workStatus !== "কমপ্লিট").length;
+    const totalRunnerCuts = records.reduce((sum, r) => sum + ((r.runnerCuts && r.runnerCuts.length) || 0), 0);
+    const totalReceived = records.reduce((sum, r) => sum + (Number(r.amountReceived) || 0), 0);
+    const totalPaid = records.reduce((sum, r) => sum + (Number(r.amountPaid) || 0), 0);
+
+    const serialBoxHtml = currentUser
+      ? `<div class="stat-box"><div class="stat-label">আপনার রেজিস্ট্রেশন সিরিয়াল</div><div class="stat-value" style="color:#0369a1;">#${currentUser.regSerial || 1}</div></div>`
+      : "";
+
+    const grid = document.getElementById("liveSummaryGrid");
+    if (!grid) return;
+    grid.innerHTML = `
+      ${serialBoxHtml}
+      <div class="stat-box">
+        <div class="stat-label">মোট ড্রাইভার / সিরিয়াল</div>
+        <div class="stat-value">${totalLicenses} জন</div>
+      </div>
+      <div class="stat-box stat-green">
+        <div class="stat-label">🟢 কমপ্লিট (সবুজ)</div>
+        <div class="stat-value">${completeCount} টি</div>
+      </div>
+      <div class="stat-box stat-red">
+        <div class="stat-label">🔴 অসম্পূর্ণ (লাল)</div>
+        <div class="stat-value">${incompleteCount} টি</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">✂️ মোট রানার কাটা</div>
+        <div class="stat-value" style="color:#be123c;">${totalRunnerCuts} বার</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">💰 মোট জমা টাকা</div>
+        <div class="stat-value" style="color:#0f766e;">৳${totalReceived.toLocaleString()}</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">💸 মোট দেওয়া / খরচ</div>
+        <div class="stat-value" style="color:#d97706;">৳${totalPaid.toLocaleString()}</div>
+      </div>
+    `;
+  }
+
+  function addLog(bspNo, eventText, trxInfo = "-") {
+    const logs = loadData(STORAGE_KEYS.LOGS, []);
+    logs.unshift({
+      id: Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+      bspNo,
+      eventText,
+      trxInfo,
+      time: new Date().toLocaleString("bn-BD")
+    });
+    saveData(STORAGE_KEYS.LOGS, logs);
+  }
+
+  function readFileAsDataUrl(file) {
+    return new Promise((resolve) => {
+      if (!file) return resolve(null);
+      const reader = new FileReader();
+      reader.onload = () => resolve({ name: file.name, type: file.type, dataUrl: reader.result });
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function showAuthScreen(mode) {
+    document.getElementById("authSection").classList.remove("hidden");
+    switchAuthTab(mode);
+  }
+
+  function switchAuthTab(mode) {
+    ["register", "login", "bsp"].forEach(t => {
+      document.getElementById("authTab" + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle("active", t === mode);
+    });
+    document.getElementById("registerFormBox").classList.toggle("hidden", mode !== "register");
+    document.getElementById("loginFormBox").classList.toggle("hidden", mode !== "login");
+    document.getElementById("bspLoginBox").classList.toggle("hidden", mode !== "bsp");
+  }
+
+  async function registerUser() {
+    const phone = document.getElementById("regPhone").value.trim();
+    const pass = document.getElementById("regPass").value;
+    const nidName = document.getElementById("regNidName").value.trim();
+    const nidNameEn = document.getElementById("regNidNameEn").value.trim();
+    const nidNo = document.getElementById("regNidNo").value.trim();
+    const dob = document.getElementById("regDob").value;
+
+    if (!phone || !pass || !nidName || !nidNo || !dob) {
+      return alert("সবগুলো আবশ্যক তথ্য পূরণ করুন।");
+    }
+    if (phone === getOwnerPhone()) {
+      return alert("এই নাম্বারটি সিস্টেম ওনারের জন্য সংরক্ষিত।");
+    }
+
+    const users = loadData(STORAGE_KEYS.USERS, []);
+    if (users.some(u => u.phone === phone)) {
+      return alert("এই মোবাইল নাম্বার দিয়ে আগেই রেজিস্ট্রেশন করা হয়েছে। লগিন করুন।");
+    }
+
+    const passHash = await computeSecretToken(pass);
+    const regSerial = users.length + 1;
+    const panelCode = "P" + regSerial + "_" + phone.slice(-4);
+
+    const newUser = {
+      id: "u_" + Date.now(),
+      regSerial,
+      panelCode,
+      phone,
+      passHash,
+      nidName,
+      nidNameEn,
+      nidNo,
+      dob,
+      role: "user",
+      channelLogins: 0,
+      muted: false,
+      secretNumber: "",
+      bizName: "",
+      bkashNumber: "",
+      hotline: "",
+      nomineeName: "",
+      bizPic: null,
+      nidFile: null,
+      profilePic: null
+    };
+
+    users.push(newUser);
+    saveData(STORAGE_KEYS.USERS, users);
+    saveData(STORAGE_KEYS.SESSION, { type: "user", userId: newUser.id });
+    alert(`রেজিস্ট্রেশন সফল হয়েছে! আপনার সিরিয়াল নং: #${regSerial}, প্যানেল কোড: ${panelCode}\nআপনার প্যানেল থেকে ৩টি লগিন করালে আপনি অ্যাডমিন প্যানেল পাবেন।`);
+    refreshUI();
+  }
+
+  async function loginUser() {
+    const phone = document.getElementById("loginPhone").value.trim();
+    const pass = document.getElementById("loginPass").value.trim();
+    const enteredChannel = (document.getElementById("loginChannelCode")?.value || "").trim() || loadData(STORAGE_KEYS.ACTIVE_PANEL_REF, "");
+
+    if (!phone || !pass) {
+      showLockAlert("মোবাইল নাম্বার এবং পাসওয়ার্ড/পিন উভয়ই লিখুন।");
+      return;
+    }
+
+    const attemptsMap = loadData(STORAGE_KEYS.ATTEMPTS, {});
+    const now = Date.now();
+    const record = attemptsMap[phone] || { count: 0, lockUntil: 0 };
+
+    if (record.lockUntil && now < record.lockUntil) {
+      const remMin = Math.ceil((record.lockUntil - now) / 60000);
+      showLockAlert(`পরপর ৫ বার ভুল দেওয়ায় এই নাম্বার ১০ মিনিটের জন্য লক হয়েছে (বাকি ~${remMin} মিনিট)।`);
+      document.getElementById("recoveryBox").classList.remove("hidden");
+      return;
+    }
+
+    const inputToken = await computeSecretToken(pass);
+    const ownerToken = await ensureOwnerToken();
+
+    if (phone === getOwnerPhone()) {
+      if (inputToken === ownerToken) {
+        delete attemptsMap[phone];
+        saveData(STORAGE_KEYS.ATTEMPTS, attemptsMap);
+        saveData(STORAGE_KEYS.SESSION, { type: "owner", phone: getOwnerPhone() });
+        hideLockAlert();
+        refreshUI();
+        return;
+      } else {
+        handleFailedAttempt(phone, attemptsMap, record);
+        return;
+      }
+    }
+
+    const users = loadData(STORAGE_KEYS.USERS, []);
+    const loggedInIdx = users.findIndex(u => u.phone === phone && u.passHash === inputToken);
+    if (loggedInIdx !== -1) {
+      delete attemptsMap[phone];
+      saveData(STORAGE_KEYS.ATTEMPTS, attemptsMap);
+
+      if (enteredChannel) {
+        const panelOwnerIdx = users.findIndex(u =>
+          u.panelCode === enteredChannel || u.phone === enteredChannel || u.id === enteredChannel
+        );
+        if (panelOwnerIdx !== -1) {
+          users[panelOwnerIdx].channelLogins = (users[panelOwnerIdx].channelLogins || 0) + 1;
+          if (users[panelOwnerIdx].channelLogins >= 3) {
+            users[panelOwnerIdx].role = "admin";
+          }
+        }
+      }
+
+      saveData(STORAGE_KEYS.USERS, users);
+      saveData(STORAGE_KEYS.SESSION, { type: "user", userId: users[loggedInIdx].id });
+      hideLockAlert();
+      refreshUI();
+    } else {
+      handleFailedAttempt(phone, attemptsMap, record);
+    }
+  }
+
+  function handleFailedAttempt(phone, attemptsMap, record) {
+    record.count = (record.count || 0) + 1;
+    if (record.count >= 5) {
+      record.lockUntil = Date.now() + SECURITY_CFG.lockMs;
+      record.count = 0;
+      attemptsMap[phone] = record;
+      saveData(STORAGE_KEYS.ATTEMPTS, attemptsMap);
+      showLockAlert("পাসওয়ার্ড পরপর ৫ বার ভুল হয়েছে! ১০ মিনিটের জন্য লক করা হলো।");
+      document.getElementById("recoveryBox").classList.remove("hidden");
+    } else {
+      attemptsMap[phone] = record;
+      saveData(STORAGE_KEYS.ATTEMPTS, attemptsMap);
+      showLockAlert(`ভুল পাসওয়ার্ড বা পিন! (${record.count}/5 বার ভুল হয়েছে)।`);
+      document.getElementById("recoveryBox").classList.remove("hidden");
+    }
+  }
+
+  function showLockAlert(msg) {
+    const el = document.getElementById("loginLockAlert");
+    el.textContent = msg;
+    el.classList.remove("hidden");
+  }
+  function hideLockAlert() {
+    document.getElementById("loginLockAlert").classList.add("hidden");
+  }
+  function toggleRecoveryBox() {
+    document.getElementById("recoveryBox").classList.toggle("hidden");
+  }
+
+  async function recoverPassword() {
+    const phone = document.getElementById("recPhone").value.trim();
+    const dob = document.getElementById("recDob").value;
+    const secret = document.getElementById("recSecret").value.trim();
+    const newPass = document.getElementById("recNewPass").value.trim();
+
+    if (!phone || !dob || !secret || !newPass) {
+      return alert("রিকভারির জন্য সবগুলো তথ্য দিন।");
+    }
+    const users = loadData(STORAGE_KEYS.USERS, []);
+    const idx = users.findIndex(u => u.phone === phone && u.dob === dob && u.secretNumber === secret);
+    if (idx === -1) {
+      return alert("মোবাইল নাম্বার, জন্ম তারিখ বা গোপন নাম্বার মেলেনি।");
+    }
+    users[idx].passHash = await computeSecretToken(newPass);
+    saveData(STORAGE_KEYS.USERS, users);
+
+    const attemptsMap = loadData(STORAGE_KEYS.ATTEMPTS, {});
+    delete attemptsMap[phone];
+    saveData(STORAGE_KEYS.ATTEMPTS, attemptsMap);
+
+    alert("নতুন পাসওয়ার্ড সেট করা হয়েছে! অনুগ্রহ করে নতুন পাসওয়ার্ডটি মনে রাখবেন।");
+    document.getElementById("loginPhone").value = phone;
+    document.getElementById("loginPass").value = newPass;
+    document.getElementById("recoveryBox").classList.add("hidden");
+    hideLockAlert();
+  }
+
+  async function completeAdminSetup() {
+    const session = loadData(STORAGE_KEYS.SESSION, null);
+    if (!session || session.type !== "user") return;
+    const users = loadData(STORAGE_KEYS.USERS, []);
+    const idx = users.findIndex(u => u.id === session.userId);
+    if (idx === -1) return;
+
+    const secret = document.getElementById("promoSecret").value.trim();
+    const dob = document.getElementById("promoDob").value;
+    const bizName = document.getElementById("promoBizName").value.trim();
+    const bkash = document.getElementById("promoBkash").value.trim();
+    const hotline = document.getElementById("promoHotline").value.trim();
+    const nominee = document.getElementById("promoNominee").value.trim();
+
+    if (!secret || !dob || !bizName || !bkash || !hotline || !nominee) {
+      return alert("সবগুলো আবশ্যক ঘর পূরণ করুন।");
+    }
+
+    const bizPic = await readFileAsDataUrl(document.getElementById("promoBizPic").files[0]);
+    const nidFile = await readFileAsDataUrl(document.getElementById("promoNidFile").files[0]);
+    const profilePic = await readFileAsDataUrl(document.getElementById("promoProfilePic").files[0]);
+
+    users[idx].role = "admin";
+    users[idx].secretNumber = secret;
+    users[idx].dob = dob;
+    users[idx].bizName = bizName;
+    users[idx].bkashNumber = bkash;
+    users[idx].hotline = hotline;
+    users[idx].nomineeName = nominee;
+    if (bizPic) users[idx].bizPic = bizPic;
+    if (nidFile) users[idx].nidFile = nidFile;
+    if (profilePic) users[idx].profilePic = profilePic;
+
+    saveData(STORAGE_KEYS.USERS, users);
+    alert("অ্যাডমিন প্রোফাইল সেভ হয়েছে!");
+    refreshUI();
+  }
+
+  function getChannelShareLink(userObj) {
+    const base = window.location.href.split("?")[0];
+    return `${base}?panel=${encodeURIComponent(userObj.panelCode)}`;
+  }
+
+  function copyMyChannelLink() {
+    const session = loadData(STORAGE_KEYS.SESSION, null);
+    if (!session || session.type !== "user") return;
+    const u = loadData(STORAGE_KEYS.USERS, []).find(item => item.id === session.userId);
+    if (!u) return;
+    const link = getChannelShareLink(u);
+    navigator.clipboard?.writeText(link);
+    alert(`প্যানেল লিংক কপি হয়েছে!\nকোড: ${u.panelCode}\nলিংক: ${link}`);
+  }
+
+  function loginBspCustomer() {
+    const bspNo = document.getElementById("bspInputNo").value.trim();
+    const last6 = document.getElementById("bspInputLast6").value.trim();
+    if (!bspNo || last6.length !== 6) {
+      return alert("সঠিক BSP নাম্বার এবং মেইন BSP মোবাইল নাম্বারের শেষ ৬ সংখ্যা দিন।");
+    }
+    const records = loadData(STORAGE_KEYS.RECORDS, []);
+    const rec = records.find(r => r.bspNo === bspNo && (r.bspPhone || "").slice(-6) === last6);
+    if (!rec) {
+      return alert("BSP নাম্বার বা শেষ ৬ ডিজিট মেলেনি।");
+    }
+    saveData(STORAGE_KEYS.BSP_SESSION, { recordId: rec.id });
+    addLog(bspNo, `BSP কাস্টমার প্রবেশ করেছে (${formatBilingual(rec.name_bn, rec.name_en)})`, "-");
+    renderBspCustomerView(rec);
+  }
+
+  function formatBilingual(bn, en) {
+    if (bn && en) return `${bn} (${en})`;
+    return bn || en || "-";
+  }
+
+  function renderBspCustomerView(rec) {
+    document.getElementById("authSection").classList.add("hidden");
+    document.getElementById("mainAppSection").classList.add("hidden");
+    document.getElementById("bspCustomerView").classList.remove("hidden");
+
+    const users = loadData(STORAGE_KEYS.USERS, []);
+    const creatorAdmin = users.find(u => u.id === rec.createdBy);
+
+    document.getElementById("bspAdminHotline").textContent =
+      (creatorAdmin && creatorAdmin.hotline) ? `হটলাইন: ${creatorAdmin.hotline}` : "";
+    document.getElementById("bspMerchantBkash").textContent =
+      (creatorAdmin && creatorAdmin.bkashNumber) ? creatorAdmin.bkashNumber : "";
+
+    const isComplete = (rec.workStatus === "কমপ্লিট");
+    const statusBanner = document.getElementById("bspStatusBanner");
+    statusBanner.className = isComplete ? "bsp-status-complete" : "bsp-status-incomplete";
+    statusBanner.innerHTML = isComplete
+      ? "🟢 কাজের অবস্থা: কমপ্লিট (কাজ সম্পন্ন হয়েছে)"
+      : "🔴 কাজের অবস্থা: অসম্পূর্ণ (কাজ চলমান / বাকি আছে)";
+
+    document.getElementById("bspBasicInfo").innerHTML = `
+      <div><strong>BSP নাম্বার:</strong> ${esc(rec.bspNo)}</div>
+      <div><strong>নাম:</strong> ${esc(formatBilingual(rec.name_bn, rec.name_en))}</div>
+      <div><strong>লাইসেন্স ধরন:</strong> ${esc(rec.licensePortion || "-")}</div>
+      <div><strong>রানার কাটা:</strong> ${(rec.runnerCuts && rec.runnerCuts.length) || 0} বার</div>
+      <div><strong>পরীক্ষার ডেট:</strong> ${esc(rec.examDate || "নির্ধারিত নয়")} (${esc(rec.examType)})</div>
+      <div><strong>পাওনা / লেনদেন:</strong> ${esc(rec.dueAmount || "কোনো বকেয়া নেই")}</div>
+    `;
+
+    const extraDiv = document.getElementById("bspExtraUnlockedInfo");
+    if (rec.bspUnlocked) {
+      extraDiv.classList.remove("hidden");
+      extraDiv.innerHTML = `
+        <div class="card" style="background:#fff; margin-top:10px;">
+          <div class="card-title">আনলককৃত অতিরিক্ত তথ্য (৫০ টাকা পেমেন্ট সম্পন্ন)</div>
+          <p><strong>NID নাম্বার:</strong> ${esc(rec.nid)}</p>
+          <p><strong>জন্ম তারিখ:</strong> ${esc(rec.dob || "-")}</p>
+          <p><strong>পিতার নাম:</strong> ${esc(formatBilingual(rec.father_bn, rec.father_en))} | <strong>মাতার নাম:</strong> ${esc(formatBilingual(rec.mother_bn, rec.mother_en))}</p>
+          <p><strong>লাইসেন্স রেফারেন্স নং:</strong> ${esc(rec.licRefNo || "-")} | <strong>লাইসেন্স নং:</strong> ${esc(rec.licenseNo || "-")}</p>
+          <p><strong>প্রথম ইস্যু:</strong> ${esc(rec.issueDate || "-")} | <strong>মেয়াদ শেষ:</strong> ${esc(rec.expiryDate || "-")}</p>
+          <p><strong>ঠিকানা:</strong> ${esc(formatBilingual(rec.village_bn, rec.village_en))}, ${esc(formatBilingual(rec.upazila_bn, rec.upazila_en))}, ${esc(formatBilingual(rec.thana_bn, rec.thana_en))}, ${esc(formatBilingual(rec.district_bn, rec.district_en))}, ${esc(formatBilingual(rec.division_bn, rec.division_en))}</p>
+        </div>
+      `;
+    } else {
+      extraDiv.classList.add("hidden");
+    }
+  }
+
+  function toggleBspExtraPayment() {
+    const bspSess = loadData(STORAGE_KEYS.BSP_SESSION, null);
+    if (!bspSess) return;
+    const records = loadData(STORAGE_KEYS.RECORDS, []);
+    const rec = records.find(r => r.id === bspSess.recordId);
+    if (rec) addLog(rec.bspNo, "আরো তথ্যের জন্য চাপ দিয়েছে (৫০ টাকা পেমেন্ট)", "-");
+    document.getElementById("bspPaymentBox").classList.remove("hidden");
+  }
+
+  function submitBspPayment() {
+    const bspSess = loadData(STORAGE_KEYS.BSP_SESSION, null);
+    if (!bspSess) return;
+    const payPhone = document.getElementById("bspPayPhone").value.trim();
+    const trxId = document.getElementById("bspPayTrx").value.trim();
+    if (!payPhone || !trxId) return alert("পেমেন্ট মোবাইল নাম্বার এবং ট্রানজেকশন নাম্বার দিন।");
+
+    const records = loadData(STORAGE_KEYS.RECORDS, []);
+    const idx = records.findIndex(r => r.id === bspSess.recordId);
+    if (idx === -1) return;
+
+    records[idx].bspUnlocked = true;
+    records[idx].lastTrx = `${payPhone} / ${trxId}`;
+    saveData(STORAGE_KEYS.RECORDS, records);
+    addLog(records[idx].bspNo, `৫০ টাকা পেমেন্ট সাবমিট করেছে (নং: ${payPhone})`, `TrxID: ${trxId}`);
+    alert("পেমেন্ট তথ্য সাবমিট হয়েছে! অতিরিক্ত তথ্য আনলক করা হলো।");
+    renderBspCustomerView(records[idx]);
+  }
+
+  function logoutBsp() {
+    localStorage.removeItem(STORAGE_KEYS.BSP_SESSION);
+    document.getElementById("bspCustomerView").classList.add("hidden");
+    document.getElementById("authSection").classList.remove("hidden");
+  }
+
+  function calculateAgeAndCheckMismatch() {
+    const dobVal = document.getElementById("f_dob").value;
+    const ageEl = document.getElementById("ageDisplay");
+    if (!dobVal) { ageEl.textContent = ""; return; }
+    const dob = new Date(dobVal);
+    const today = new Date();
+    let years = today.getFullYear() - dob.getFullYear();
+    let months = today.getMonth() - dob.getMonth();
+    let days = today.getDate() - dob.getDate();
+    if (days < 0) { months--; days += 30; }
+    if (months < 0) { years--; months += 12; }
+    ageEl.textContent = `বয়স: ${years} বছর ${months} মাস ${days} দিন`;
+  }
+
+  function calculateLicenseExpiry() {
+    const expVal = document.getElementById("f_expiryDate").value;
+    const el = document.getElementById("licenseStatusText");
+    const failInput = document.getElementById("f_failDuration");
+    if (!expVal) { el.textContent = ""; return; }
+    const exp = new Date(expVal);
+    const today = new Date();
+    const diffDays = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
+    if (diffDays < 0) {
+      const absDays = Math.abs(diffDays);
+      const yrs = Math.floor(absDays / 365);
+      const remDays = absDays % 365;
+      el.style.color = "var(--danger)";
+      el.textContent = `রিনিউ ডেট গেছে ${yrs} বছর ${remDays} দিন (মোট ${absDays} দিন)`;
+      if (failInput && !failInput.value.trim()) {
+        failInput.value = `${yrs} বছর ${remDays} দিন ফেল / মেয়াদ উত্তীর্ণ`;
+      }
+    } else {
+      el.style.color = "var(--success)";
+      el.textContent = `মেয়াদ আছে ${diffDays} দিন`;
+    }
+  }
+
+  async function saveDriverRecord() {
+    const session = loadData(STORAGE_KEYS.SESSION, null);
+    if (!session) return alert("আগে লগিন করুন।");
+
+    const bspNo = document.getElementById("f_bspNo").value.trim();
+    const name_bn = document.getElementById("f_name_bn").value.trim();
+    const name_en = document.getElementById("f_name_en").value.trim();
+    const nid = document.getElementById("f_nid").value.trim();
+    if (!bspNo || (!name_bn && !name_en) || !nid) {
+      return alert("BSP নাম্বার, নাম (বাংলা/ইংরেজী) এবং NID নাম্বার আবশ্যক।");
+    }
+
+    const gender = getSelectedRadioValue("genderRadio");
+    const blood = getSelectedRadioValue("bloodRadio");
+    const workStatus = getSelectedRadioValue("workStatusRadio") || "অসম্পূর্ণ";
+    const licensePortion = getSelectedRadioValue("licensePortionRadio") || "পুরাতন / রিনিউ লাইসেন্স";
+
+    const absentReasons = Array.from(document.querySelectorAll(".absent-reason:checked")).map(cb => cb.value);
+    const customerPhoto = await readFileAsDataUrl(document.getElementById("doc_customerPhoto").files[0]);
+    const runnerFiles = await Promise.all(Array.from(document.getElementById("doc_runnerFiles").files).map(readFileAsDataUrl));
+    const epaperLicenseFiles = await Promise.all(Array.from(document.getElementById("doc_epaperLicense").files).map(readFileAsDataUrl));
+    const nidFiles = await Promise.all(Array.from(document.getElementById("doc_nid").files).map(readFileAsDataUrl));
+    const oldLicenseFiles = await Promise.all(Array.from(document.getElementById("doc_oldLicense").files).map(readFileAsDataUrl));
+    const utilityFile = await readFileAsDataUrl(document.getElementById("doc_utility").files[0]);
+
+    const records = loadData(STORAGE_KEYS.RECORDS, []);
+    const editId = document.getElementById("editRecordId").value;
+    const existing = editId ? records.find(r => r.id === editId) : null;
+
+    const recObj = {
+      id: existing ? existing.id : "rec_" + Date.now(),
+      createdBy: existing ? existing.createdBy : (session.type === "owner" ? "owner" : session.userId),
+      workStatus,
+      emergencyCard: document.getElementById("f_emergencyCard").checked,
+      emergencyPin: document.getElementById("f_emergencyPin").value.trim(),
+      runnerCuts: [...currentDraftRunnerCuts],
+      bspNo,
+      bspPhone: document.getElementById("f_bspPhone").value.trim(),
+      name_bn,
+      name_en,
+      gender,
+      blood,
+      nid,
+      dob: document.getElementById("f_dob").value,
+      father_bn: document.getElementById("f_father_bn").value.trim(),
+      father_en: document.getElementById("f_father_en").value.trim(),
+      mother_bn: document.getElementById("f_mother_bn").value.trim(),
+      mother_en: document.getElementById("f_mother_en").value.trim(),
+      spouse_bn: document.getElementById("f_spouse_bn").value.trim(),
+      spouse_en: document.getElementById("f_spouse_en").value.trim(),
+      emName_bn: document.getElementById("f_emName_bn").value.trim(),
+      emName_en: document.getElementById("f_emName_en").value.trim(),
+      emRelation: document.getElementById("f_emRelation").value.trim(),
+      emPhone: document.getElementById("f_emPhone").value.trim(),
+      village_bn: document.getElementById("f_village_bn").value.trim(),
+      village_en: document.getElementById("f_village_en").value.trim(),
+      upazila_bn: document.getElementById("f_upazila_bn").value.trim(),
+      upazila_en: document.getElementById("f_upazila_en").value.trim(),
+      thana_bn: document.getElementById("f_thana_bn").value.trim(),
+      thana_en: document.getElementById("f_thana_en").value.trim(),
+      district_bn: document.getElementById("f_district_bn").value.trim(),
+      district_en: document.getElementById("f_district_en").value.trim(),
+      division_bn: document.getElementById("f_division_bn").value.trim(),
+      division_en: document.getElementById("f_division_en").value.trim(),
+      passport: document.getElementById("f_passport").value.trim(),
+      birthReg: document.getElementById("f_birthReg").value.trim(),
+      licensePortion,
+      licRefNo: document.getElementById("f_licRefNo").value.trim(),
+      firstData: document.getElementById("f_firstData").value.trim(),
+      issueDate: document.getElementById("f_issueDate").value,
+      expiryDate: document.getElementById("f_expiryDate").value,
+      licenseNo: document.getElementById("f_licenseNo").value.trim(),
+      profType: document.getElementById("f_profType").value,
+      category: document.getElementById("f_category").value.trim(),
+      mismatchNote: document.getElementById("f_mismatchNote").value.trim(),
+      failDuration: document.getElementById("f_failDuration").value.trim(),
+      examType: document.getElementById("f_examType").value,
+      examDate: document.getElementById("f_examDate").value,
+      sourceAgent: document.getElementById("f_sourceAgent").value.trim(),
+      commission: document.getElementById("f_commission").value.trim(),
+      brtaOffice: document.getElementById("f_brtaOffice").value.trim(),
+      transferBrta: document.getElementById("f_transferBrta").value.trim(),
+      dupTestBrta: document.getElementById("f_dupTestBrta").value.trim(),
+      amountReceived: Number(document.getElementById("f_amountReceived").value || 0),
+      amountPaid: Number(document.getElementById("f_amountPaid").value || 0),
+      dueAmount: document.getElementById("f_dueAmount").value.trim(),
+      runnerStatus: document.getElementById("f_runnerStatus").value.trim(),
+      absentReasons,
+      absentComment: document.getElementById("f_absentComment").value.trim(),
+      bspUnlocked: existing ? existing.bspUnlocked : false,
+      lastTrx: existing ? existing.lastTrx : "",
+      docs: {
+        customerPhoto: customerPhoto || (existing && existing.docs?.customerPhoto) || null,
+        runnerFiles: [
+          ...((existing && existing.docs?.runnerFiles) || []),
+          ...runnerFiles
+        ],
+        epaperLicenseFiles: [
+          ...((existing && existing.docs?.epaperLicenseFiles) || []),
+          ...epaperLicenseFiles
+        ],
+        nidFiles: nidFiles.length ? nidFiles : (existing && existing.docs?.nidFiles) || [],
+        oldLicenseFiles: oldLicenseFiles.length ? oldLicenseFiles : (existing && existing.docs?.oldLicenseFiles) || [],
+        utilityFile: utilityFile || (existing && existing.docs?.utilityFile) || null
+      }
+    };
+
+    if (existing) {
+      const idx = records.findIndex(r => r.id === editId);
+      records[idx] = recObj;
+      saveData(STORAGE_KEYS.RECORDS, records);
+      alert("তথ্য ও ডকুমেন্ট আপডেট হয়েছে।");
+    } else {
+      records.push(recObj);
+      saveData(STORAGE_KEYS.RECORDS, records);
+      alert("ড্রাইভার তথ্য ও ডকুমেন্ট সেভ হয়েছে!");
+    }
+
+    clearDriverForm();
+    refreshUI();
+  }
+
+  function clearDriverForm() {
+    document.getElementById("editRecordId").value = "";
+    document.getElementById("entryFormTitle").textContent = "ব্যক্তিগত তথ্য ফর্ম (বাংলা ও ইংরেজী)";
+    currentDraftRunnerCuts = [];
+    renderRunnerCutDraft();
+    document.querySelectorAll("#sectionEntry input, #sectionEntry textarea").forEach(inp => {
+      if (inp.type === "checkbox" || inp.type === "radio") inp.checked = false;
+      else if (inp.type !== "file") inp.value = "";
+    });
+    setRadioValue("workStatusRadio", "অসম্পূর্ণ");
+    setRadioValue("licensePortionRadio", "পুরাতন / রিনিউ লাইসেন্স");
+    toggleLicensePortionFields();
+    calculateBalancePreview();
+    document.getElementById("ageDisplay").textContent = "";
+    document.getElementById("licenseStatusText").textContent = "";
+  }
+
+  function editDriverRecord(id) {
+    const records = getScopedRecords();
+    const r = records.find(item => item.id === id);
+    if (!r) return alert("এই ফাইলের অ্যাক্সেস নেই।");
+
+    switchAppTab("entry");
+    document.getElementById("editRecordId").value = r.id;
+    document.getElementById("entryFormTitle").textContent = `এডিট করুন: ${formatBilingual(r.name_bn, r.name_en)} (BSP: ${r.bspNo})`;
+    currentDraftRunnerCuts = Array.isArray(r.runnerCuts) ? [...r.runnerCuts] : [];
+    renderRunnerCutDraft();
+
+    const setVal = (domId, val) => { const el = document.getElementById(domId); if (el) el.value = val ?? ""; };
+    Object.keys(r).forEach(k => setVal("f_" + k, r[k]));
+
+    document.getElementById("f_emergencyCard").checked = !!r.emergencyCard;
+    setRadioValue("genderRadio", r.gender);
+    setRadioValue("bloodRadio", r.blood);
+    setRadioValue("workStatusRadio", r.workStatus || "অসম্পূর্ণ");
+    setRadioValue("licensePortionRadio", r.licensePortion || "পুরাতন / রিনিউ লাইসেন্স");
+    toggleLicensePortionFields();
+    calculateBalancePreview();
+
+    document.querySelectorAll(".absent-reason").forEach(cb => {
+      cb.checked = (r.absentReasons || []).includes(cb.value);
+    });
+
+    calculateAgeAndCheckMismatch();
+    calculateLicenseExpiry();
+  }
+
+  async function deleteDriverRecord(id) {
+    const session = loadData(STORAGE_KEYS.SESSION, null);
+    if (!session) return;
+    const enteredPass = prompt("ডকুমেন্ট/তথ্য ডিলিট করতে হলে আপনার লগিন পাসওয়ার্ড দিন:");
+    if (enteredPass === null) return;
+
+    const enteredToken = await computeSecretToken(enteredPass.trim());
+    const ownerToken = await ensureOwnerToken();
+    let valid = false;
+
+    if (session.type === "owner") {
+      valid = (enteredToken === ownerToken);
+    } else {
+      const users = loadData(STORAGE_KEYS.USERS, []);
+      const u = users.find(item => item.id === session.userId);
+      if (u && u.passHash === enteredToken) valid = true;
+    }
+
+    if (!valid) return alert("ভুল পাসওয়ার্ড! তথ্য ডিলিট করা হয়নি।");
+
+    const allRecords = loadData(STORAGE_KEYS.RECORDS, []);
+    const target = allRecords.find(r => r.id === id);
+    if (!target) return;
+    if (session.type !== "owner" && target.createdBy !== session.userId) {
+      return alert("অন্যের ফাইল ডিলিট করার অনুমতি নেই।");
+    }
+
+    saveData(STORAGE_KEYS.RECORDS, allRecords.filter(r => r.id !== id));
+    alert("তথ্য সফলভাবে ডিলিট করা হয়েছে।");
+    refreshAllViews();
+  }
+
+  function renderRecordsTable() {
+    const filterQ = (document.getElementById("panelFilterInput")?.value || "").trim().toLowerCase();
+    const statusFilter = document.getElementById("statusFilterSelect")?.value || "all";
+    let records = getScopedRecords();
+
+    if (statusFilter === "কমপ্লিট" || statusFilter === "অসম্পূর্ণ") {
+      records = records.filter(r => (r.workStatus || "অসম্পূর্ণ") === statusFilter);
+    } else if (statusFilter === "emergency") {
+      records = records.filter(r => !!r.emergencyCard);
+    }
+
+    if (filterQ) {
+      records = records.filter(r =>
+        (r.bspNo || "").toLowerCase().includes(filterQ) ||
+        (r.nid || "").toLowerCase().includes(filterQ) ||
+        (r.name_bn || "").toLowerCase().includes(filterQ) ||
+        (r.name_en || "").toLowerCase().includes(filterQ)
+      );
+    }
+
+    const tbody = document.getElementById("recordsTableBody");
+    if (!records.length) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted);">কোনো রেকর্ড পাওয়া যায়নি।</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = records.map((r, idx) => {
+      const isComplete = (r.workStatus === "কমপ্লিট");
+      const rowClass = isComplete ? "row-complete" : "row-incomplete";
+      const statusBadge = isComplete
+        ? `<span class="badge badge-complete">🟢 কমপ্লিট</span>`
+        : `<span class="badge badge-incomplete">🔴 অসম্পূর্ণ</span>`;
+      const emerBadge = r.emergencyCard
+        ? `<br><span class="badge badge-emergency">🚨 পিন: ${esc(r.emergencyPin || "আছে")}</span>`
+        : "";
+      const cutCount = (r.runnerCuts && r.runnerCuts.length) || 0;
+      const recAmt = Number(r.amountReceived) || 0;
+      const paidAmt = Number(r.amountPaid) || 0;
+      const runnerPdfCount = (r.docs?.runnerFiles || []).length;
+      const epaperPdfCount = (r.docs?.epaperLicenseFiles || []).length;
+
+      return `
+        <tr class="${rowClass}">
+          <td><strong>#${idx + 1}</strong></td>
+          <td>
+            ${statusBadge}${emerBadge}<br>
+            <strong style="margin-top:4px; display:inline-block;">BSP: ${esc(r.bspNo)}</strong><br>
+            <small>${esc(r.bspPhone || "")}</small>
+          </td>
+          <td>
+            <strong>${esc(formatBilingual(r.name_bn, r.name_en))}</strong><br>
+            <small>NID: ${esc(r.nid)} | ${esc(r.gender || "-")} | রক্ত: ${esc(r.blood || "-")}</small>
+          </td>
+          <td>
+            <strong>✂️ রানার কাটা: ${cutCount} বার</strong><br>
+            <small>রানার: ${runnerPdfCount} | ই-পেপার: ${epaperPdfCount}</small><br>
+            <small>${esc(r.licensePortion || "-")} (${esc(r.licenseNo || "-")})</small>
+          </td>
+          <td>
+            BRTA: ${esc(r.brtaOffice || "-")}<br>
+            <small>পরীক্ষা: ${esc(r.examDate || "-")} (${esc(r.examType)})</small>
+          </td>
+          <td>
+            জমা: <strong>৳${recAmt.toLocaleString()}</strong><br>
+            দেওয়া: <strong>৳${paidAmt.toLocaleString()}</strong><br>
+            <small>${esc(r.dueAmount || "-")}</small>
+          </td>
+          <td class="no-print">
+            <button class="btn-success btn-sm" style="margin-bottom:4px;" onclick="quickToggleStatus('${r.id}')">${isComplete ? "অসম্পূর্ণ করুন" : "কমপ্লিট করুন"}</button>
+            <button class="btn-danger btn-sm" style="margin-bottom:4px;" onclick="quickAddRunnerCut('${r.id}')">+ রানার কাটা</button><br>
+            <button class="btn-outline btn-sm" onclick="openRecordDetail('${r.id}')">দেখুন/প্রিন্ট</button>
+            <button class="btn-accent btn-sm" onclick="editDriverRecord('${r.id}')">এডিট</button>
+            <button class="btn-danger btn-sm" onclick="deleteDriverRecord('${r.id}')">ডিলিট</button>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  function renderExamSchedule() {
+    const container = document.getElementById("examScheduleList");
+    if (!container) return;
+    const records = getScopedRecords();
+
+    const examRecords = records
+      .filter(r => !!r.examDate)
+      .sort((a, b) => new Date(a.examDate) - new Date(b.examDate));
+
+    if (!examRecords.length) {
+      container.innerHTML = `<div class="card" style="grid-column:1/-1; text-align:center; color:var(--muted);">কোনো পরীক্ষার তারিখ সেট করা হয়নি।</div>`;
+      return;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    container.innerHTML = examRecords.map((r, index) => {
+      const exDate = new Date(r.examDate);
+      exDate.setHours(0, 0, 0, 0);
+      const diffDays = Math.ceil((exDate - today) / (1000 * 60 * 60 * 24));
+      const isComplete = (r.workStatus === "কমপ্লিট");
+
+      let autoAlert = "";
+      if (isComplete) {
+        autoAlert = `<span class="badge badge-complete">✅ কমপ্লিট (সবুজ)</span>`;
+      } else if (diffDays < 0) {
+        autoAlert = `<span class="badge badge-incomplete">⏰ ${Math.abs(diffDays)} দিন আগে গেছে — অটো-আপডেট: ফলাফল/রানার যাচাই করুন</span>`;
+      } else if (diffDays === 0) {
+        autoAlert = `<span class="badge badge-emergency">🔥 আজ পরীক্ষা!</span>`;
+      } else if (diffDays <= 4) {
+        autoAlert = `<span class="badge badge-incomplete">⚠️ আর মাত্র ${diffDays} দিন বাকি!</span>`;
+      } else {
+        autoAlert = `<span class="badge badge-user">📅 ${diffDays} দিন বাকি</span>`;
+      }
+
+      return `
+        <div class="${isComplete ? "exam-card-complete" : "exam-card-incomplete"}">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; flex-wrap:wrap;">
+            <strong>পরীক্ষা সিরিয়াল #${index + 1} • BSP: ${esc(r.bspNo)}</strong>
+            ${autoAlert}
+          </div>
+          <div style="margin-top:6px;">
+            <strong>নাম:</strong> ${esc(formatBilingual(r.name_bn, r.name_en))} | <strong>NID:</strong> ${esc(r.nid)}<br>
+            <strong>পরীক্ষার তারিখ:</strong> ${esc(r.examDate)} (${esc(r.examType)}) | <strong>BRTA:</strong> ${esc(r.brtaOffice || "-")}<br>
+            <strong>রানার কাটা:</strong> ${(r.runnerCuts && r.runnerCuts.length) || 0} বার
+          </div>
+          <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
+            <button type="button" class="btn-success btn-sm" onclick="quickToggleStatus('${r.id}')">
+              ${isComplete ? "অসম্পূর্ণ (লাল) করুন" : "কমপ্লিট (সবুজ) করুন"}
+            </button>
+            <button type="button" class="btn-danger btn-sm" onclick="quickAddRunnerCut('${r.id}')">
+              + রানার কাটা যুক্ত করুন
+            </button>
+            <button type="button" class="btn-outline btn-sm" onclick="editDriverRecord('${r.id}')">
+              এডিট
+            </button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  let activeDetailRecord = null;
+  function openRecordDetail(id) {
+    const records = loadData(STORAGE_KEYS.RECORDS, []);
+    const r = records.find(item => item.id === id);
+    if (!r) return alert("রেকর্ড পাওয়া যায়নি।");
+    activeDetailRecord = r;
+
+    const renderDocLink = (label, fileObj) => {
+      if (!fileObj || !fileObj.dataUrl) return `<div><strong>${label}:</strong> নেই</div>`;
+      const isImg = (fileObj.type || "").startsWith("image/");
+      return `
+        <div class="doc-box">
+          <strong>${label} (${esc(fileObj.name)})</strong>
+          <div class="doc-preview">
+            ${isImg ? `<img src="${fileObj.dataUrl}" alt="${esc(label)}" />` : `<span>PDF / ডকুমেন্ট</span>`}
+            <a href="${fileObj.dataUrl}" download="${esc(fileObj.name)}" class="btn-primary btn-sm" style="text-decoration:none;">ডাউনলোড</a>
+          </div>
+        </div>
+      `;
+    };
+
+    const runnerListHtml = (r.docs?.runnerFiles || []).map((f, i) => renderDocLink(`রানার কপি #${i + 1}`, f)).join("");
+    const epaperListHtml = (r.docs?.epaperLicenseFiles || []).map((f, i) => renderDocLink(`ই-পেপার লাইসেন্স #${i + 1}`, f)).join("");
+    const nidListHtml = (r.docs?.nidFiles || []).map((f, i) => renderDocLink(`NID ফাইল #${i + 1}`, f)).join("");
+    const oldLicListHtml = (r.docs?.oldLicenseFiles || []).map((f, i) => renderDocLink(`পুরাতন/সার্টিফিকেট #${i + 1}`, f)).join("");
+
+    const cutsHtml = (r.runnerCuts && r.runnerCuts.length)
+      ? r.runnerCuts.map((c, i) => `<li>#${i + 1}: ${esc(c.reason)} (${esc(c.date)})</li>`).join("")
+      : "<li>কোনো রানার কাটা হয়নি</li>";
+
+    document.getElementById("recordDetailContent").innerHTML = `
+      <div style="margin-bottom:10px;">
+        <strong>কাজের অবস্থা:</strong> ${r.workStatus === "কমপ্লিট" ? '<span class="badge badge-complete">🟢 কমপ্লিট</span>' : '<span class="badge badge-incomplete">🔴 অসম্পূর্ণ</span>'}
+        ${r.emergencyCard ? `<span class="badge badge-emergency">🚨 ইমারজেন্সি পিন: ${esc(r.emergencyPin || "-")}</span>` : ""}
+      </div>
+      <div class="grid-3">
+        <div><strong>সিরিয়াল / BSP নং:</strong> ${esc(r.bspNo)}</div>
+        <div><strong>নাম (বাংলা/ইংরেজী):</strong> ${esc(formatBilingual(r.name_bn, r.name_en))}</div>
+        <div><strong>লিঙ্গ / রক্তের গ্রুপ:</strong> ${esc(r.gender || "-")} / ${esc(r.blood || "-")}</div>
+        <div><strong>NID নং:</strong> ${esc(r.nid)}</div>
+        <div><strong>জন্ম তারিখ:</strong> ${esc(r.dob || "-")}</div>
+        <div><strong>পিতা:</strong> ${esc(formatBilingual(r.father_bn, r.father_en))}</div>
+        <div><strong>মাতা:</strong> ${esc(formatBilingual(r.mother_bn, r.mother_en))}</div>
+        <div><strong>স্বামী/স্ত্রী:</strong> ${esc(formatBilingual(r.spouse_bn, r.spouse_en))}</div>
+        <div><strong>জরুরি যোগাযোগ:</strong> ${esc(formatBilingual(r.emName_bn, r.emName_en))} (${esc(r.emRelation || "-")} - ${esc(r.emPhone || "-")})</div>
+        <div><strong>ঠিকানা:</strong> ${esc(formatBilingual(r.village_bn, r.village_en))}, ${esc(formatBilingual(r.upazila_bn, r.upazila_en))}, ${esc(formatBilingual(r.thana_bn, r.thana_en))}, ${esc(formatBilingual(r.district_bn, r.district_en))}, ${esc(formatBilingual(r.division_bn, r.division_en))}</div>
+        <div><strong>পাসপোর্ট / জন্ম নিবন্ধন:</strong> ${esc(r.passport || "-")} / ${esc(r.birthReg || "-")}</div>
+        <div><strong>লাইসেন্স ধরন:</strong> ${esc(r.licensePortion || "-")}</div>
+        <div><strong>লাইসেন্স রেফারেন্স নং:</strong> ${esc(r.licRefNo || "-")}</div>
+        <div><strong>লাইসেন্স নং:</strong> ${esc(r.licenseNo || "-")} (${esc(r.profType)})</div>
+        <div><strong>প্রথম ইস্যু / লাস্ট ডেট:</strong> ${esc(r.issueDate || "-")} / ${esc(r.expiryDate || "-")}</div>
+        <div><strong>কত বছর ফেল / অমিল:</strong> ${esc(r.failDuration || "-")} / ${esc(r.mismatchNote || "-")}</div>
+        <div><strong>পরীক্ষা:</strong> ${esc(r.examDate || "-")} (${esc(r.examType)})</div>
+        <div><strong>BRTA / ট্রান্সফার / ডুপ টেস্ট:</strong> ${esc(r.brtaOffice || "-")} / ${esc(r.transferBrta || "-")} / ${esc(r.dupTestBrta || "-")}</div>
+        <div><strong>জমা / দেওয়া টাকা:</strong> ৳${(Number(r.amountReceived)||0).toLocaleString()} / ৳${(Number(r.amountPaid)||0).toLocaleString()}</div>
+        <div><strong>পাওনা / লেনদেন নোট:</strong> ${esc(r.dueAmount || "-")}</div>
+      </div>
+
+      <div style="margin-top:12px; background:#fff1f2; padding:10px; border-radius:8px; border:1px solid #fecdd3;">
+        <strong>✂️ রানার কাটার হিসাব (মোট ${(r.runnerCuts && r.runnerCuts.length) || 0} বার):</strong>
+        <ul style="margin-left:18px; margin-top:4px; font-size:0.86rem;">${cutsHtml}</ul>
+      </div>
+
+      <div class="grid-3" style="margin-top:14px;">
+        ${renderDocLink("কাস্টমারের ছবি", r.docs?.customerPhoto)}
+        ${runnerListHtml}
+        ${epaperListHtml}
+        ${nidListHtml}
+        ${oldLicListHtml}
+        ${renderDocLink("বিদ্যুৎ বিল / মিটার কাগজ", r.docs?.utilityFile)}
+      </div>
+    `;
+    document.getElementById("recordDetailModal").classList.remove("hidden");
+  }
+
+  function closeDetailModal() {
+    document.getElementById("recordDetailModal").classList.add("hidden");
+  }
+
+  function shareRecordText() {
+    if (!activeDetailRecord) return;
+    const r = activeDetailRecord;
+    const summary = `ড্রাইভার তথ্য\nঅবস্থা: ${r.workStatus || "অসম্পূর্ণ"}\nBSP: ${r.bspNo}\nনাম: ${formatBilingual(r.name_bn, r.name_en)}\nNID: ${r.nid}\nরানার কাটা: ${(r.runnerCuts && r.runnerCuts.length) || 0} বার\nলাইসেন্স: ${r.licenseNo || "-"}\nপরীক্ষা: ${r.examDate || "-"}\nজমা: ৳${Number(r.amountReceived)||0} | দেওয়া: ৳${Number(r.amountPaid)||0}`;
+    navigator.clipboard?.writeText(summary);
+    alert("ড্রাইভারের সারসংক্ষেপ কপি হয়েছে।");
+  }
+
+  function toggleBspTargetInput() {
+    const mode = document.getElementById("msgTargetMode")?.value;
+    document.getElementById("bspTargetGroup")?.classList.toggle("hidden", mode !== "bsp");
+    document.getElementById("singleTargetGroup")?.classList.toggle("hidden", mode !== "broadcast_single");
+  }
+
+  function populateOwnerMessageSelectors() {
+    const session = loadData(STORAGE_KEYS.SESSION, null);
+    const isOwner = session && session.type === "owner";
+    document.getElementById("optBroadcastAll")?.classList.toggle("hidden", !isOwner);
+    document.getElementById("optBroadcastSingle")?.classList.toggle("hidden", !isOwner);
+
+    const sel = document.getElementById("msgSingleSelect");
+    if (!sel) return;
+    const users = loadData(STORAGE_KEYS.USERS, []);
+    const records = loadData(STORAGE_KEYS.RECORDS, []);
+    let opts = "";
+    users.forEach(u => {
+      opts += `<option value="user:${u.id}">ইউজার: ${esc(formatBilingual(u.nidName, u.nidNameEn))} (${esc(u.phone)})</option>`;
+    });
+    records.forEach(r => {
+      opts += `<option value="bsp:${r.bspNo}">BSP ${esc(r.bspNo)} — ${esc(formatBilingual(r.name_bn, r.name_en))}</option>`;
+    });
+    sel.innerHTML = opts || `<option value="">কোনো প্রাপক নেই</option>`;
+  }
+
+  function openHelpMessageBox() {
+    const session = loadData(STORAGE_KEYS.SESSION, null);
+    if (!session) {
+      alert("সমস্যা জানাতে প্রথমে লগিন বা রেজিস্ট্রেশন করুন।");
+      showAuthScreen("login");
+      return;
+    }
+    document.getElementById("mainAppSection")?.classList.remove("hidden");
+    switchAppTab("msg");
+    const txt = document.getElementById("msgTextInput");
+    if (txt) {
+      txt.placeholder = "ড্রাইভার সমন্যা সমাধান ড্রাইভিংক লাইসেন্সের কোন রকম সমস্যা থাকলে বলতে পারেন — এখানে লিখুন...";
+      txt.focus();
+    }
+  }
+
+  async function sendMessage() {
+    const session = loadData(STORAGE_KEYS.SESSION, null);
+    if (!session) return;
+
+    const users = loadData(STORAGE_KEYS.USERS, []);
+    const records = loadData(STORAGE_KEYS.RECORDS, []);
+    const currentUser = (session.type === "user") ? users.find(u => u.id === session.userId) : null;
+
+    if (currentUser && currentUser.muted) {
+      return alert("ওনার আপনাকে মেসেজ পাঠানো থেকে মিউট করে রেখেছেন।");
+    }
+
+    const text = document.getElementById("msgTextInput").value.trim();
+    const fileObj = await readFileAsDataUrl(document.getElementById("msgFileInput").files[0]);
+    if (!text && !fileObj) return alert("মেসেজ বা ফাইল দিন।");
+
+    const asOwnership = (document.getElementById("msgAsOwnership")?.value === "ownership");
+    const targetMode = document.getElementById("msgTargetMode")?.value || "general";
+    const targetBsp = (document.getElementById("msgTargetBsp")?.value || "").trim();
+    const singleVal = document.getElementById("msgSingleSelect")?.value || "";
+
+    const ownerName = decodeOwnerName();
+    const senderLabel = asOwnership
+      ? "ওনারশিপ ড্রাইভার তথ্য"
+      : (session.type === "owner" ? ownerName : (currentUser?.bizName || currentUser?.nidName || "কাস্টমার"));
+
+    const messages = loadData(STORAGE_KEYS.MESSAGES, []);
+    const nowStr = new Date().toLocaleString("bn-BD");
+
+    if (session.type === "owner" && targetMode === "broadcast_all") {
+      const recipients = [];
+      records.forEach(r => {
+        recipients.push({
+          label: `BSP: ${r.bspNo} | নাম: ${formatBilingual(r.name_bn, r.name_en)}`,
+          bspNo: r.bspNo,
+          userId: r.createdBy
+        });
+      });
+      users.forEach(u => {
+        recipients.push({
+          label: `ইউজার #${u.regSerial || "-"} | নাম: ${formatBilingual(u.nidName, u.nidNameEn)} (${u.phone})`,
+          bspNo: "-",
+          userId: u.id
+        });
+      });
+
+      if (!recipients.length) {
+        messages.push({
+          id: "m_" + Date.now(),
+          senderId: "owner",
+          sender: "ওনারশিপ ড্রাইভার তথ্য",
+          recipientLabel: "সকল প্যানেল ও ইউজার",
+          targetBsp: "-",
+          ownershipTag: "ওনারশিপ ড্রাইভার তথ্য",
+          text,
+          file: fileObj,
+          time: nowStr
+        });
+      } else {
+        recipients.forEach((rep, i) => {
+          messages.push({
+            id: "m_" + Date.now() + "_" + i,
+            senderId: "owner",
+            targetUserId: rep.userId,
+            sender: "ওনারশিপ ড্রাইভার তথ্য",
+            recipientLabel: rep.label,
+            targetBsp: rep.bspNo,
+            ownershipTag: "ওনারশিপ ড্রাইভার তথ্য",
+            text: `${rep.label} — ${text}`,
+            file: fileObj,
+            time: nowStr
+          });
+        });
+      }
+      addLog("ALL", `ওনার একসাথে সবাইকে মেসেজ পাঠিয়েছেন (${recipients.length} জন)`, "ওনারশিপ ড্রাইভার তথ্য");
+    } else {
+      let recipientLabel = "অ্যাডমিন ও ওনার প্যানেল";
+      let targetUserId = null;
+
+      if (targetMode === "bsp") {
+        recipientLabel = `BSP নাম্বার: ${targetBsp}`;
+        const matchedRec = records.find(r => r.bspNo === targetBsp);
+        if (matchedRec) targetUserId = matchedRec.createdBy;
+      } else if (session.type === "owner" && targetMode === "broadcast_single" && singleVal) {
+        if (singleVal.startsWith("user:")) {
+          targetUserId = singleVal.replace("user:", "");
+          const uObj = users.find(u => u.id === targetUserId);
+          recipientLabel = uObj ? `ইউজার: ${formatBilingual(uObj.nidName, uObj.nidNameEn)}` : singleVal;
+        } else if (singleVal.startsWith("bsp:")) {
+          const bNo = singleVal.replace("bsp:", "");
+          const rObj = records.find(r => r.bspNo === bNo);
+          recipientLabel = `BSP: ${bNo} (${rObj ? formatBilingual(rObj.name_bn, rObj.name_en) : ""})`;
+          if (rObj) targetUserId = rObj.createdBy;
+        }
+      }
+
+      messages.push({
+        id: "m_" + Date.now(),
+        senderId: session.type === "owner" ? "owner" : session.userId,
+        targetUserId,
+        sender: senderLabel,
+        recipientLabel,
+        targetBsp: targetMode === "bsp" ? targetBsp : "-",
+        ownershipTag: asOwnership ? "ওনারশিপ ড্রাইভার তথ্য" : "",
+        text,
+        file: fileObj,
+        time: nowStr
+      });
+
+      addLog(targetBsp || "-", `${senderLabel} → ${recipientLabel}: ${text || "[ফাইল]"}`, asOwnership ? "ওনারশিপ ড্রাইভার তথ্য" : "-");
+    }
+
+    saveData(STORAGE_KEYS.MESSAGES, messages);
+    document.getElementById("msgTextInput").value = "";
+    document.getElementById("msgFileInput").value = "";
+    renderMessages();
+  }
+
+  function renderMessages() {
+    const session = loadData(STORAGE_KEYS.SESSION, null);
+    let messages = loadData(STORAGE_KEYS.MESSAGES, []);
+    if (session && session.type !== "owner") {
+      messages = messages.filter(m =>
+        m.senderId === session.userId ||
+        m.senderId === "owner" ||
+        m.targetUserId === session.userId
+      );
+    }
+    const box = document.getElementById("messageFeed");
+    if (!messages.length) {
+      box.innerHTML = `<div style="color:var(--muted);">এখনো কোনো মেসেজ নেই।</div>`;
+      return;
+    }
+    box.innerHTML = messages.map(m => `
+      <div class="msg-item">
+        <div style="font-size:0.78rem; color:var(--muted);">
+          <strong>${esc(m.sender)}</strong> → <strong>${esc(m.recipientLabel || "প্যানেল")}</strong> • ${esc(m.time)}
+        </div>
+        ${m.ownershipTag ? `<div class="msg-ownership-tag">${esc(m.ownershipTag)}</div>` : ""}
+        ${m.text ? `<div style="margin-top:4px;">${esc(m.text)}</div>` : ""}
+        ${m.file ? `<div style="margin-top:6px;"><a href="${m.file.dataUrl}" download="${esc(m.file.name)}" class="btn-outline btn-sm" style="text-decoration:none;">ফাইল ডাউনলোড: ${esc(m.file.name)}</a></div>` : ""}
+      </div>
+    `).join("");
+  }
+
+  function handleGlobalSearch() {
+    const q = document.getElementById("globalSearchInput").value.trim().toLowerCase();
+    const box = document.getElementById("globalSearchResults");
+    if (!q) { box.style.display = "none"; return; }
+
+    const users = loadData(STORAGE_KEYS.USERS, []);
+    const records = getScopedRecords();
+
+    const matchedAdmins = users.filter(u =>
+      u.role === "admin" && ((u.bizName || "").toLowerCase().includes(q) || (u.nidName || "").toLowerCase().includes(q) || (u.nidNameEn || "").toLowerCase().includes(q))
+    );
+    const matchedRecords = records.filter(r =>
+      (r.bspNo || "").toLowerCase().includes(q) || (r.nid || "").toLowerCase().includes(q) || (r.name_bn || "").toLowerCase().includes(q) || (r.name_en || "").toLowerCase().includes(q)
+    );
+
+    let html = "";
+    matchedAdmins.forEach(a => {
+      html += `
+        <div class="search-item" onclick="selectAdminFromSearch('${a.id}')">
+          <div>
+            <strong>${esc(a.bizName || formatBilingual(a.nidName, a.nidNameEn))}</strong> <span class="badge badge-admin">অ্যাডমিন / বিজনেস</span><br/>
+            <small>বিকাশ/নগদ: ${esc(a.bkashNumber || "-")} | হটলাইন: ${esc(a.hotline || "-")}</small>
+          </div>
+          <span>দেখুন →</span>
+        </div>
+      `;
+    });
+
+    matchedRecords.forEach(r => {
+      html += `
+        <div class="search-item" onclick="selectRecordFromSearch('${r.id}')">
+          <div>
+            <strong>${esc(formatBilingual(r.name_bn, r.name_en))}</strong> (BSP: ${esc(r.bspNo)})<br/>
+            <small>NID: ${esc(r.nid)} | অবস্থা: ${esc(r.workStatus || "অসম্পূর্ণ")}</small>
+          </div>
+          <span>প্রোফাইল →</span>
+        </div>
+      `;
+    });
+
+    if (!html) html = `<div class="search-item">কোনো ফলাফল পাওয়া যায়নি।</div>`;
+    box.innerHTML = html;
+    box.style.display = "block";
+  }
+
+  function selectAdminFromSearch(userId) {
+    document.getElementById("globalSearchResults").style.display = "none";
+    const a = loadData(STORAGE_KEYS.USERS, []).find(u => u.id === userId);
+    if (!a) return;
+    alert(`নাম/বিজনেস: ${a.bizName || formatBilingual(a.nidName, a.nidNameEn)}\nবিকাশ/নগদ: ${a.bkashNumber || "-"}\nহটলাইন: ${a.hotline || "-"}`);
+  }
+
+  function selectRecordFromSearch(recId) {
+    document.getElementById("globalSearchResults").style.display = "none";
+    openRecordDetail(recId);
+  }
+
+  function toggleMuteUser(userId) {
+    const users = loadData(STORAGE_KEYS.USERS, []);
+    const idx = users.findIndex(u => u.id === userId);
+    if (idx === -1) return;
+    users[idx].muted = !users[idx].muted;
+    saveData(STORAGE_KEYS.USERS, users);
+    renderOwnerPanel();
+  }
+
+  function renderOwnerPanel() {
+    const users = loadData(STORAGE_KEYS.USERS, []);
+    const records = loadData(STORAGE_KEYS.RECORDS, []);
+    const logs = loadData(STORAGE_KEYS.LOGS, []);
+    const ownerName = decodeOwnerName();
+
+    document.getElementById("ownerPanelTitle").textContent = `ওনার প্যানেল — ${ownerName}`;
+    document.getElementById("ownerStats").innerHTML = `
+      <div class="card" style="margin:0;"><strong>মোট রেজিস্টার্ড সিরিয়াল:</strong> ${users.length}</div>
+      <div class="card" style="margin:0;"><strong>মোট অ্যাডমিন (৩ প্যানেল লগিনে):</strong> ${users.filter(u => u.role === "admin").length}</div>
+      <div class="card" style="margin:0;"><strong>মোট ড্রাইভার রেকর্ড:</strong> ${records.length}</div>
+    `;
+
+    document.getElementById("ownerUsersBody").innerHTML = users.map((u, i) => {
+      const uDriverCount = records.filter(r => r.createdBy === u.id).length;
+      return `
+        <tr>
+          <td><strong>#${u.regSerial || (i + 1)}</strong> • <strong>${esc(u.phone)}</strong><br><small>কোড: ${esc(u.panelCode || "-")}</small></td>
+          <td>
+            <span class="badge ${u.role === "admin" ? "badge-admin" : "badge-user"}">${u.role === "admin" ? "অ্যাডমিন" : "কাস্টমার"}</span>
+            ${u.muted ? `<span class="badge badge-incomplete">মিউট</span>` : ""}<br>
+            <small>প্যানেল লগিন: ${u.channelLogins || 0}/3</small>
+          </td>
+          <td>
+            <strong>পিন: ${esc(u.secretNumber || "-")}</strong><br>
+            <small>${esc(formatBilingual(u.nidName, u.nidNameEn))} | NID: ${esc(u.nidNo)} | জন্ম: ${esc(u.dob || "-")}</small>
+          </td>
+          <td>বিজনেস: ${esc(u.bizName || "-")}<br><small>নমিনি: ${esc(u.nomineeName || "-")}</small></td>
+          <td>বিকাশ/নগদ: ${esc(u.bkashNumber || "-")}<br><small>হটলাইন: ${esc(u.hotline || "-")}</small></td>
+          <td>
+            <strong>মোট ড্রাইভার: ${uDriverCount} জন</strong><br>
+            ${u.bizPic ? `<a href="${u.bizPic.dataUrl}" download="${esc(u.bizPic.name)}">অ্যাপ পিক</a> ` : ""}
+            ${u.nidFile ? `<a href="${u.nidFile.dataUrl}" download="${esc(u.nidFile.name)}">NID ফাইল</a> ` : ""}
+            ${u.profilePic ? `<a href="${u.profilePic.dataUrl}" download="${esc(u.profilePic.name)}">প্রোফাইল পিক</a>` : ""}
+          </td>
+          <td>
+            <button class="btn-outline btn-sm" style="margin-bottom:4px;" onclick="toggleMuteUser('${u.id}')">${u.muted ? "আনমিউট" : "মিউট করুন"}</button><br>
+            <button class="btn-accent btn-sm" onclick="ownerResetUserPass('${u.id}')">পাসওয়ার্ড বদল</button>
+            <button class="btn-danger btn-sm" onclick="ownerDeleteUser('${u.id}')">ডিলিট</button>
+          </td>
+        </tr>
+      `;
+    }).join("") || `<tr><td colspan="7">কোনো ইউজার নেই।</td></tr>`;
+
+    document.getElementById("ownerDocsBody").innerHTML = records.map(r => {
+      const creator = users.find(u => u.id === r.createdBy);
+      const creatorLabel = creator ? `${creator.bizName || creator.nidName} (${creator.phone})` : "ওনার";
+      const fileLinks = [];
+      if (r.docs?.customerPhoto?.dataUrl) fileLinks.push(`<a href="${r.docs.customerPhoto.dataUrl}" download="${esc(r.docs.customerPhoto.name)}">ছবি</a>`);
+      (r.docs?.runnerFiles || []).forEach((f, idx) => fileLinks.push(`<a href="${f.dataUrl}" download="${esc(f.name)}">রানার#${idx+1}</a>`));
+      (r.docs?.epaperLicenseFiles || []).forEach((f, idx) => fileLinks.push(`<a href="${f.dataUrl}" download="${esc(f.name)}">ই-পেপার#${idx+1}</a>`));
+      (r.docs?.nidFiles || []).forEach((f, idx) => fileLinks.push(`<a href="${f.dataUrl}" download="${esc(f.name)}">NID#${idx+1}</a>`));
+      (r.docs?.oldLicenseFiles || []).forEach((f, idx) => fileLinks.push(`<a href="${f.dataUrl}" download="${esc(f.name)}">পুরাতন#${idx+1}</a>`));
+      if (r.docs?.utilityFile?.dataUrl) fileLinks.push(`<a href="${r.docs.utilityFile.dataUrl}" download="${esc(r.docs.utilityFile.name)}">বিল/মিটার</a>`);
+
+      return `
+        <tr>
+          <td><strong>BSP: ${esc(r.bspNo)}</strong></td>
+          <td><strong>${esc(formatBilingual(r.name_bn, r.name_en))}</strong><br><small>NID: ${esc(r.nid)}</small></td>
+          <td>${esc(creatorLabel)}</td>
+          <td>${fileLinks.length ? fileLinks.join(" • ") : "কোনো ফাইল নেই"} <button class="btn-outline btn-sm" onclick="openRecordDetail('${r.id}')">সব দেখুন</button></td>
+        </tr>
+      `;
+    }).join("") || `<tr><td colspan="4">কোনো ড্রাইভার ডকুমেন্ট নেই।</td></tr>`;
+
+    document.getElementById("ownerLogsBody").innerHTML = logs.map(l => `
+      <tr>
+        <td><strong>${esc(l.bspNo)}</strong></td>
+        <td>${esc(l.eventText)}</td>
+        <td>${esc(l.trxInfo)}</td>
+        <td>${esc(l.time)}</td>
+      </tr>
+    `).join("") || `<tr><td colspan="4">কোনো লগ নেই।</td></tr>`;
+  }
+
+  async function ownerResetUserPass(userId) {
+    const newPass = prompt("নতুন পাসওয়ার্ড দিন:");
+    if (!newPass) return;
+    const users = loadData(STORAGE_KEYS.USERS, []);
+    const idx = users.findIndex(u => u.id === userId);
+    if (idx !== -1) {
+      users[idx].passHash = await computeSecretToken(newPass.trim());
+      saveData(STORAGE_KEYS.USERS, users);
+      alert("নতুন পাসওয়ার্ড আপডেট হয়েছে।");
+      renderOwnerPanel();
+    }
+  }
+
+  function ownerDeleteUser(userId) {
+    if (!confirm("এই ইউজারকে ডিলিট করতে চান?")) return;
+    const users = loadData(STORAGE_KEYS.USERS, []).filter(u => u.id !== userId);
+    saveData(STORAGE_KEYS.USERS, users);
+    renderOwnerPanel();
+  }
+
+  function switchAppTab(tab) {
+    ["entry", "list", "exam", "msg", "owner"].forEach(t => {
+      document.getElementById("tab" + t.charAt(0).toUpperCase() + t.slice(1) + "Btn")?.classList.toggle("active", t === tab);
+      document.getElementById("section" + t.charAt(0).toUpperCase() + t.slice(1))?.classList.toggle("hidden", t !== tab);
+    });
+    if (tab === "list") renderRecordsTable();
+    if (tab === "exam") renderExamSchedule();
+    if (tab === "msg") { populateOwnerMessageSelectors(); renderMessages(); }
+    if (tab === "owner") renderOwnerPanel();
+  }
+
+  function logout() {
+    localStorage.removeItem(STORAGE_KEYS.SESSION);
+    refreshUI();
+  }
+
+  function refreshAllViews() {
+    renderSummaryDashboard();
+    renderRecordsTable();
+    renderExamSchedule();
+    renderMessages();
+  }
+
+  function refreshUI() {
+    const ownerName = decodeOwnerName();
+    const ownerPhone = getOwnerPhone();
+
+    const bspSess = loadData(STORAGE_KEYS.BSP_SESSION, null);
+    if (bspSess) {
+      const rec = loadData(STORAGE_KEYS.RECORDS, []).find(r => r.id === bspSess.recordId);
+      if (rec) { renderBspCustomerView(rec); return; }
+    }
+
+    const session = loadData(STORAGE_KEYS.SESSION, null);
+    const badgeEl = document.getElementById("currentUserBadge");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const authSection = document.getElementById("authSection");
+    const mainApp = document.getElementById("mainAppSection");
+    const channelPanelBox = document.getElementById("userChannelPanelBox");
+    const ownerContactStrip = document.getElementById("adminOwnerContactStrip");
+    const promoBox = document.getElementById("adminPromotionBox");
+    const appBodyContent = document.getElementById("appBodyContent");
+    const ownerTabBtn = document.getElementById("tabOwnerBtn");
+    const muteNotice = document.getElementById("muteNoticeBox");
+
+    if (!session) {
+      badgeEl.innerHTML = `<span class="badge badge-user">লগিন হয়নি</span>`;
+      logoutBtn.classList.add("hidden");
+      authSection.classList.remove("hidden");
+      mainApp.classList.add("hidden");
+      ownerTabBtn.classList.add("hidden");
+      return;
+    }
+
+    authSection.classList.add("hidden");
+    mainApp.classList.remove("hidden");
+    logoutBtn.classList.remove("hidden");
+
+    if (session.type === "owner") {
+      badgeEl.innerHTML = `<span class="badge badge-owner">ওনার প্যানেল</span>`;
+      channelPanelBox.classList.add("hidden");
+      ownerContactStrip.classList.add("hidden");
+      muteNotice?.classList.add("hidden");
+      promoBox.classList.add("hidden");
+      appBodyContent.classList.remove("hidden");
+      ownerTabBtn.classList.remove("hidden");
+      ownerTabBtn.textContent = "ওনার প্যানেল";
+      document.getElementById("headerBrandName").textContent = "ড্রাইভার তথ্য (ওনার প্যানেল)";
+      document.getElementById("headerHotline").textContent = "সম্পূর্ণ প্রশাসনিক ও ফাইল নিয়ন্ত্রণ";
+    } else {
+      ownerTabBtn.classList.add("hidden");
+      const users = loadData(STORAGE_KEYS.USERS, []);
+      const u = users.find(item => item.id === session.userId);
+      if (!u) { logout(); return; }
+
+      muteNotice?.classList.toggle("hidden", !u.muted);
+
+      channelPanelBox.classList.remove("hidden");
+      document.getElementById("myChannelTitle").textContent = `আমার প্যানেল চ্যানেল (${esc(u.panelCode)}) • সিরিয়াল #${u.regSerial || 1}`;
+      document.getElementById("myChannelStats").textContent =
+        `আপনার প্যানেল থেকে লগিন হয়েছে: ${u.channelLogins || 0} / 3 বার ${u.role === "admin" ? "— আপনি অ্যাডমিন হয়েছেন!" : "— ৩টি লগিন হলে অ্যাডমিন প্যানেল পাবেন"}`;
+      document.getElementById("myChannelLinkText").textContent = `প্যানেল লিংক: ${getChannelShareLink(u)}`;
+
+      if (u.role === "admin" && (u.channelLogins || 0) >= 3) {
+        badgeEl.innerHTML = `<span class="badge badge-admin">অ্যাডমিন #${u.regSerial || 1} (${esc(u.bizName || u.phone)})</span>`;
+        ownerContactStrip.classList.remove("hidden");
+        ownerContactStrip.textContent = `👑 ওনারের নাম: ${ownerName} | ওনারের মোবাইল নাম্বার: ${ownerPhone}`;
+        document.getElementById("headerBrandName").textContent = u.bizName ? `ড্রাইভার তথ্য - ${u.bizName}` : "ড্রাইভার তথ্য (অ্যাডমিন)";
+        document.getElementById("headerHotline").textContent = u.hotline ? `হটলাইন: ${u.hotline}` : "অ্যাডমিন প্যানেল";
+        if (u.bizPic?.dataUrl) document.getElementById("headerLogo").src = u.bizPic.dataUrl;
+
+        document.getElementById("adminPromotionHeading").textContent =
+          `স্বাগতম ও শুভেচ্ছা, ${ownerName} ভাইয়ের পক্ষ থেকে।`;
+
+        if (!u.secretNumber || !u.dob || !u.bizName) {
+          promoBox.classList.remove("hidden");
+          appBodyContent.classList.add("hidden");
+        } else {
+          promoBox.classList.add("hidden");
+          appBodyContent.classList.remove("hidden");
+        }
+      } else {
+        ownerContactStrip.classList.add("hidden");
+        badgeEl.innerHTML = `<span class="badge badge-user">সিরিয়াল #${u.regSerial || 1} • ${esc(formatBilingual(u.nidName, u.nidNameEn))} • প্যানেল লগিন: ${u.channelLogins || 0}/3</span>`;
+        promoBox.classList.add("hidden");
+        appBodyContent.classList.remove("hidden");
+      }
+    }
+
+    populateOwnerMessageSelectors();
+    renderRunnerCutDraft();
+    refreshAllViews();
+  }
+
+  function esc(str) {
+    return String(str ?? "").replace(/[&<>"']/g, s => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[s]));
+  }
+
+  initStorage();
+  initUrlPanelRef();
+  ensureOwnerToken();
+  refreshUI();
+</script>
+</body>
+</html>
